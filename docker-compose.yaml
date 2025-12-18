@@ -3,13 +3,24 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_USER:
-      POSTGRES_PASSWORD:
-      POSTGRES_DB:
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - '5432:5432'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
+  redis:
+    image: redis
+    restart: always
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD}
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
 
 volumes:
-   postgres_data:
+   pgdata:
+   redis_data:
