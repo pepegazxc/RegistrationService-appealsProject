@@ -16,6 +16,9 @@ public class Configuration {
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 )
+                .formLogin(login -> login
+                        .loginPage("/login").permitAll()
+                )
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();
