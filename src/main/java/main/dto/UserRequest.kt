@@ -11,6 +11,8 @@ data class UserRequest(
     @field:NotNull
     val name: String,
     @field:NotNull
+    val surname: String,
+    @field:NotNull
     @field:Email(message = "Wrong format of email")
     val email: String,
     @field:NotNull
