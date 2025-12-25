@@ -12,9 +12,11 @@ import java.sql.Timestamp;
 public class RegistrationService {
 
     private final RegistrationUserRepository registrationRepository;
+    private final CipherService cipher;
 
-    public RegistrationService(RegistrationUserRepository registrationRepository) {
+    public RegistrationService(RegistrationUserRepository registrationRepository, CipherService cipher) {
         this.registrationRepository = registrationRepository;
+        this.cipher = cipher;
     }
 
     @Transactional
@@ -23,8 +25,8 @@ public class RegistrationService {
                 .name(request.getName())
                 .surname(request.getSurname())
                 .userIdentifier(null)
-                .cipherEmail(request.getEmail())
-                .cipherPhoneNumber(request.getPhoneNumber())
+                .cipherEmail(cipher.encrypt(request.getEmail()))
+                .cipherPhoneNumber(cipher.encrypt(request.getPhoneNumber()))
                 .hashPassword(request.getPassword())
                 .build();
     }
