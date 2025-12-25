@@ -3,6 +3,7 @@ package main.service;
 import main.dto.UserRequest;
 import main.entity.UsersEntity;
 import main.repository.RegistrationUserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,10 +14,12 @@ public class RegistrationService {
 
     private final RegistrationUserRepository registrationRepository;
     private final CipherService cipher;
+    private final PasswordEncoder encoder;
 
-    public RegistrationService(RegistrationUserRepository registrationRepository, CipherService cipher) {
+    public RegistrationService(RegistrationUserRepository registrationRepository, CipherService cipher, PasswordEncoder encoder) {
         this.registrationRepository = registrationRepository;
         this.cipher = cipher;
+        this.encoder = encoder;
     }
 
     @Transactional
@@ -27,7 +30,9 @@ public class RegistrationService {
                 .userIdentifier(null)
                 .cipherEmail(cipher.encrypt(request.getEmail()))
                 .cipherPhoneNumber(cipher.encrypt(request.getPhoneNumber()))
-                .hashPassword(request.getPassword())
+                .hashPassword(encoder.encode(request.getPassword()))
                 .build();
+
+        registrationRepository.save(user);
     }
 }

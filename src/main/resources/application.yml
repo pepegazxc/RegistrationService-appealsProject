@@ -17,3 +17,8 @@ spring:
     redis:
       host: ${REDIS_HOST}
       password: ${REDIS_PASSWORD}
+
+Jasypt:
+  encryptor:
+    algorithm: ${ALGORITHM}
+    gcm-secret-key-salt: ${SALT}
