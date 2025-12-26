@@ -15,11 +15,13 @@ public class RegistrationService {
     private final RegistrationUserRepository registrationRepository;
     private final CipherService cipher;
     private final PasswordEncoder encoder;
+    private final UserIdentifierService userIdentifier;
 
-    public RegistrationService(RegistrationUserRepository registrationRepository, CipherService cipher, PasswordEncoder encoder) {
+    public RegistrationService(RegistrationUserRepository registrationRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier) {
         this.registrationRepository = registrationRepository;
         this.cipher = cipher;
         this.encoder = encoder;
+        this.userIdentifier = userIdentifier;
     }
 
     @Transactional
@@ -27,12 +29,20 @@ public class RegistrationService {
         UsersEntity user = new UsersEntity.Builder()
                 .name(request.getName())
                 .surname(request.getSurname())
-                .userIdentifier(null)
+                .userIdentifier(generateUserIdentifier())
                 .cipherEmail(cipher.encrypt(request.getEmail()))
                 .cipherPhoneNumber(cipher.encrypt(request.getPhoneNumber()))
                 .hashPassword(encoder.encode(request.getPassword()))
                 .build();
 
         registrationRepository.save(user);
+    }
+
+    private String generateUserIdentifier(){
+        String identifier;
+        do{
+            identifier = userIdentifier.generate();
+        } while (registrationRepository.existsByUserIdentifier(identifier));
+        return identifier;
     }
 }
