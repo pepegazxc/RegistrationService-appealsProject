@@ -1,5 +1,6 @@
 package main.service;
 
+import lombok.extern.slf4j.Slf4j;
 import main.dto.UserRequest;
 import main.entity.UsersEntity;
 import main.repository.RegistrationUserRepository;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 
 @Service
+@Slf4j
 public class RegistrationService {
 
     private final RegistrationUserRepository registrationRepository;
@@ -36,6 +38,7 @@ public class RegistrationService {
                 .build();
 
         registrationRepository.save(user);
+        log.info("New user {} has been registered. Unique identifier {}", user.getName(), user.getUserIdentifier());
     }
 
     private String generateUserIdentifier(){
