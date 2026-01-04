@@ -1,6 +1,5 @@
 package main.security;
 
-import org.springframework.beans.factory.BeanRegistrarDslMarker;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,7 +9,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password4j.Argon2Password4jPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -22,7 +20,7 @@ public class Config {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/registration","/login").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().hasAuthority("USER")
                 )
                 .formLogin(login -> login
                         .loginPage("/login").permitAll()
