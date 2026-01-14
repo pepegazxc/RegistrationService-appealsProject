@@ -4,15 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import main.dto.UserRequest;
 import main.entity.UsersEntity;
 import main.repository.RegistrationUserRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-
 @Service
 @Slf4j
-public class RegistrationService {
+public class RegistrationService implements UserDetailsService {
 
     private final RegistrationUserRepository registrationRepository;
     private final CipherService cipher;
@@ -24,6 +25,21 @@ public class RegistrationService {
         this.cipher = cipher;
         this.encoder = encoder;
         this.userIdentifier = userIdentifier;
+    }
+
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        String cipherEmail = encoder.encode(email);
+
+        UsersEntity user = registrationRepository.findByCipherEmail(cipherEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getUserIdentifier())
+                .password(user.getHashPassword())
+                .authorities("ROLE_USER")
+                .build();
     }
 
     @Transactional
@@ -48,4 +64,5 @@ public class RegistrationService {
         } while (registrationRepository.existsByUserIdentifier(identifier));
         return identifier;
     }
+
 }

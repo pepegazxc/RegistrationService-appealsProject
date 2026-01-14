@@ -18,7 +18,7 @@ import java.util.List;
 @Table(name = "users")
 @Getter
 @Setter
-public class UsersEntity implements UserDetails {
+public class UsersEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,41 +46,6 @@ public class UsersEntity implements UserDetails {
     @UpdateTimestamp
     @Column(name = "updated_at")
     Timestamp updatedAt;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("USER"));
-    }
-
-    @Override
-    public @Nullable String getPassword() {
-        return hashPassword;
-    }
-
-    @Override
-    public String getUsername() {
-        return name;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 
     public static class Builder{
         UsersEntity users = new UsersEntity();

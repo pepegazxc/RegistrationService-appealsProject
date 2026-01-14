@@ -18,9 +18,9 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    public void autoAuth(String userIdentifier, String password, HttpServletRequest httpRequest){
+    public void autoAuth(String email, String password, HttpServletRequest httpRequest){
         Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userIdentifier, password)
+                new UsernamePasswordAuthenticationToken(email, password)
         );
         SecurityContextHolder.getContext().setAuthentication(auth);
         HttpSession httpSession = httpRequest.getSession(true);
