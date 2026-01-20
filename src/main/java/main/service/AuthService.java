@@ -20,7 +20,10 @@ public class AuthService {
 
     public void autoAuth(String email, String password, HttpServletRequest httpRequest){
         Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)
+                new UsernamePasswordAuthenticationToken(
+                        email,
+                        password
+                )
         );
         SecurityContextHolder.getContext().setAuthentication(auth);
         HttpSession httpSession = httpRequest.getSession(true);
