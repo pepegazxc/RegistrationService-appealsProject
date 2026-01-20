@@ -38,7 +38,7 @@ public class RegistrationService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUserIdentifier())
                 .password(user.getHashPassword())
-                .authorities("ROLE_USER")
+                .authorities(user.getRole())
                 .build();
     }
 
@@ -51,6 +51,7 @@ public class RegistrationService implements UserDetailsService {
                 .cipherEmail(cipher.encrypt(request.getEmail()))
                 .cipherPhoneNumber(cipher.encrypt(request.getPhoneNumber()))
                 .hashPassword(encoder.encode(request.getPassword()))
+                .role("ROLE_USER")
                 .build();
 
         registrationRepository.save(user);
