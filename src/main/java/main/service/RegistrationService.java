@@ -30,11 +30,15 @@ public class RegistrationService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        String cipherEmail = encoder.encode(email);
+        String cipherEmail = cipher.encrypt(email);
 
         UsersEntity user = registrationRepository.findByCipherEmail(cipherEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    log.warn("Authentication failed: User not found");
+                    return new UsernameNotFoundException("User not found");
+                });
 
+        log.debug("User details loaded for identifier {}", user.getUserIdentifier());
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUserIdentifier())
                 .password(user.getHashPassword())
@@ -55,7 +59,7 @@ public class RegistrationService implements UserDetailsService {
                 .build();
 
         registrationRepository.save(user);
-        log.info("New user {} has been registered. Unique identifier {}", user.getName(), user.getUserIdentifier());
+        log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
     }
 
     private String generateUserIdentifier(){
