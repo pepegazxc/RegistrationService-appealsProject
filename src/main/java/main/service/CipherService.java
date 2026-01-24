@@ -1,9 +1,11 @@
 package main.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class CipherService {
 
     private final StringEncryptor encryptor;
@@ -13,6 +15,7 @@ public class CipherService {
     }
 
     public String encrypt(String str){
+        log.info("cipher email {}", str);
         return encryptor.encrypt(str);
     }
 

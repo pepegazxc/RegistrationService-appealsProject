@@ -48,6 +48,7 @@ public class RegistrationService implements UserDetailsService {
 
     @Transactional
     public void registration(UserRequest request){
+        log.info("Enter into registration method ");
         UsersEntity user = new UsersEntity.Builder()
                 .name(request.getName())
                 .surname(request.getSurname())
@@ -57,6 +58,10 @@ public class RegistrationService implements UserDetailsService {
                 .hashPassword(encoder.encode(request.getPassword()))
                 .role("ROLE_USER")
                 .build();
+
+        log.info("user data {}, {}, {}, {}, {}, {}, {}", user.getName(), user.getSurname(), user.getUserIdentifier(), user.getCipherEmail(), user.getCipherPhoneNumber(), user.getHashPassword(), user.getRole());
+        log.info("Two cipher email {}, {}", cipher.encrypt(request.getEmail()), cipher.encrypt(request.getEmail()));
+        log.info(String.valueOf(cipher.encrypt(request.getEmail()).equals(cipher.encrypt(request.getEmail()))));
 
         registrationRepository.save(user);
         log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());

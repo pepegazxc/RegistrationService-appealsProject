@@ -23,4 +23,5 @@ spring:
 Jasypt:
   encryptor:
     algorithm: ${JASYPT_ALGORITHM}
+    password: ${JASYPT_PASSWORD}
     gcm-secret-key-salt: ${JASYPT_SALT}
