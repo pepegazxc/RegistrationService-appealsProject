@@ -2,6 +2,8 @@ server:
   port: 8081
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     driver-class-name: org.postgresql.Driver
     password: ${POSTGRES_PASSWORD}
@@ -20,5 +22,5 @@ spring:
 
 Jasypt:
   encryptor:
-    algorithm: ${ALGORITHM}
-    gcm-secret-key-salt: ${SALT}
+    algorithm: ${JASYPT_ALGORITHM}
+    gcm-secret-key-salt: ${JASYPT_SALT}
