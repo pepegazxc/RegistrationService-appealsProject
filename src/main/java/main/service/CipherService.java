@@ -15,7 +15,6 @@ public class CipherService {
     }
 
     public String encrypt(String str){
-        log.info("cipher email {}", str);
         return encryptor.encrypt(str);
     }
 

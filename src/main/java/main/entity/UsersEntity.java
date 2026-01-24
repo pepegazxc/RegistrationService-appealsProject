@@ -47,7 +47,7 @@ public class UsersEntity {
     @Column(name = "updated_at")
     Timestamp updatedAt;
 
-    String role;
+    String roles;
 
     public static class Builder{
         UsersEntity users = new UsersEntity();
@@ -87,8 +87,8 @@ public class UsersEntity {
             return this;
         }
 
-        public Builder role(String role){
-            users.role = role;
+        public Builder roles(String roles){
+            users.roles = roles;
             return this;
         }
 
