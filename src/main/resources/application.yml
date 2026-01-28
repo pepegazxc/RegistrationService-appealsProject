@@ -25,3 +25,6 @@ Jasypt:
     algorithm: ${JASYPT_ALGORITHM}
     password: ${JASYPT_PASSWORD}
     gcm-secret-key-salt: ${JASYPT_SALT}
+
+token:
+  key: ${JWT_KEY}
