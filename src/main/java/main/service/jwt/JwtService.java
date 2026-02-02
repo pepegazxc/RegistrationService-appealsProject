@@ -28,7 +28,6 @@ public class JwtService {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof UsersEntity customUserDetails) {
-            claims.put("userIdentifier", customUserDetails.getUserIdentifier());
             claims.put("roles", customUserDetails.getRoles());
         }
         return generateToken(claims, userDetails);
