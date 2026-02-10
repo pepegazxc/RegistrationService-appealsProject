@@ -4,11 +4,13 @@ server:
 spring:
   config:
     import: optional:file:.env[.properties]
+
   datasource:
     driver-class-name: org.postgresql.Driver
     password: ${POSTGRES_PASSWORD}
     username: ${POSTGRES_USERNAME}
     url: ${POSTGRES_URL}
+
   jpa:
     database: postgresql
     hibernate:
@@ -17,6 +19,7 @@ spring:
 
   data:
     redis:
+      port: ${REDIS_PORT}
       host: ${REDIS_HOST}
       password: ${REDIS_PASSWORD}
 
