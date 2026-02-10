@@ -48,7 +48,6 @@ public class RegistrationService implements UserDetailsService {
 
     @Transactional
     public void registration(UserRequest request){
-        log.info("Enter into registration method ");
         UsersEntity user = new UsersEntity.Builder()
                 .name(request.getName())
                 .surname(request.getSurname())
