@@ -1,10 +1,10 @@
 package main.service.jwt;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import main.entity.UsersEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,9 +14,9 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 @Service
+@Slf4j
 public class JwtService {
     @Value("${token.key}")
     private String key;
@@ -26,6 +26,7 @@ public class JwtService {
         if (userDetails instanceof UsersEntity customUserDetails) {
             claims.put("roles", customUserDetails.getRoles());
         }
+
         return generateToken(claims, userDetails);
     }
 
@@ -37,7 +38,13 @@ public class JwtService {
     }
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(key);
-        return Keys.hmacShaKeyFor(keyBytes);
+        try {
+            byte[] keyBytes = Decoders.BASE64.decode(key);
+
+            return Keys.hmacShaKeyFor(keyBytes);
+        }catch (Exception e){
+            log.error("Failed to get JWT signing key", e);
+            throw new IllegalStateException(e.getMessage());
+        }
     }
 }
