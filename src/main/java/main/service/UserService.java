@@ -13,14 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
-public class RegistrationService implements UserDetailsService {
+public class UserService implements UserDetailsService {
 
     private final RegistrationUserRepository registrationRepository;
     private final CipherService cipher;
     private final PasswordEncoder encoder;
     private final UserIdentifierService userIdentifier;
 
-    public RegistrationService(RegistrationUserRepository registrationRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier) {
+    public UserService(RegistrationUserRepository registrationRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier) {
         this.registrationRepository = registrationRepository;
         this.cipher = cipher;
         this.encoder = encoder;
@@ -32,11 +32,7 @@ public class RegistrationService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         String cipherEmail = cipher.encrypt(email);
 
-        UsersEntity user = registrationRepository.findByCipherEmail(cipherEmail)
-                .orElseThrow(() -> {
-                    log.warn("Authentication failed: User not found");
-                    return new UsernameNotFoundException("User not found");
-                });
+        UsersEntity user = findByCipherEmail(cipherEmail);
 
         log.debug("User details loaded for identifier {}", user.getUserIdentifier());
         return org.springframework.security.core.userdetails.User
@@ -48,15 +44,8 @@ public class RegistrationService implements UserDetailsService {
 
     @Transactional
     public void registration(UserRequest request){
-        UsersEntity user = new UsersEntity.Builder()
-                .name(request.getName())
-                .surname(request.getSurname())
-                .userIdentifier(generateUserIdentifier())
-                .cipherEmail(cipher.encrypt(request.getEmail()))
-                .cipherPhoneNumber(cipher.encrypt(request.getPhoneNumber()))
-                .hashPassword(encoder.encode(request.getPassword()))
-                .roles("ROLE_USER")
-                .build();
+
+        UsersEntity user = addNewUser(request);
 
         registrationRepository.save(user);
         log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
@@ -68,6 +57,26 @@ public class RegistrationService implements UserDetailsService {
             identifier = userIdentifier.generate();
         } while (registrationRepository.existsByUserIdentifier(identifier));
         return identifier;
+    }
+    
+    private UsersEntity findByCipherEmail(String cipherEmail){
+        return registrationRepository.findByCipherEmail(cipherEmail)
+                .orElseThrow(() -> {
+                    log.warn("Authentication failed: User not found");
+                    return new UsernameNotFoundException("User not found");
+                });
+    }
+
+    private UsersEntity addNewUser(UserRequest request){
+        return new UsersEntity.Builder()
+                .name(request.getName())
+                .surname(request.getSurname())
+                .userIdentifier(generateUserIdentifier())
+                .cipherEmail(cipher.encrypt(request.getEmail()))
+                .cipherPhoneNumber(cipher.encrypt(request.getPhoneNumber()))
+                .hashPassword(encoder.encode(request.getPassword()))
+                .roles("ROLE_USER")
+                .build();
     }
 
 }

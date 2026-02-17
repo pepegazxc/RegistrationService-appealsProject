@@ -7,7 +7,7 @@ import main.dto.AuthResponse;
 import main.dto.RefreshTokenResponse;
 import main.dto.UserRequest;
 import main.service.AuthService;
-import main.service.RegistrationService;
+import main.service.UserService;
 import main.service.jwt.AuthTokenService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class UserController {
 
-    private final RegistrationService registrationService;
+    private final UserService userService;
     private final AuthService auth;
     private final AuthTokenService jwt;
 
-    public UserController(RegistrationService registrationService, AuthService auth, AuthTokenService jwt) {
-        this.registrationService = registrationService;
+    public UserController(UserService userService, AuthService auth, AuthTokenService jwt) {
+        this.userService = userService;
         this.auth = auth;
         this.jwt = jwt;
     }
@@ -31,7 +31,7 @@ public class UserController {
     @PostMapping("/registration")
     public ResponseEntity<AuthResponse> registration(@Valid @RequestBody UserRequest request, HttpServletRequest httpRequest){
         log.info("Registration attempt email={}", request.getEmail());
-        registrationService.registration(request);
+        userService.registration(request);
         auth.autoAuth(request.getEmail(), request.getPassword(), httpRequest);
 
         String token = jwt.generateJwtTokenForCurrentUser();
