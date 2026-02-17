@@ -3,7 +3,7 @@ package main.service;
 import lombok.extern.slf4j.Slf4j;
 import main.dto.UserRequest;
 import main.entity.UsersEntity;
-import main.repository.RegistrationUserRepository;
+import main.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,13 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class UserService implements UserDetailsService {
 
-    private final RegistrationUserRepository registrationRepository;
+    private final UserRepository userRepository;
     private final CipherService cipher;
     private final PasswordEncoder encoder;
     private final UserIdentifierService userIdentifier;
 
-    public UserService(RegistrationUserRepository registrationRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier) {
-        this.registrationRepository = registrationRepository;
+    public UserService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier) {
+        this.userRepository = userRepository;
         this.cipher = cipher;
         this.encoder = encoder;
         this.userIdentifier = userIdentifier;
@@ -47,7 +47,7 @@ public class UserService implements UserDetailsService {
 
         UsersEntity user = addNewUser(request);
 
-        registrationRepository.save(user);
+        userRepository.save(user);
         log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
     }
 
@@ -55,12 +55,12 @@ public class UserService implements UserDetailsService {
         String identifier;
         do{
             identifier = userIdentifier.generate();
-        } while (registrationRepository.existsByUserIdentifier(identifier));
+        } while (userRepository.existsByUserIdentifier(identifier));
         return identifier;
     }
     
     private UsersEntity findByCipherEmail(String cipherEmail){
-        return registrationRepository.findByCipherEmail(cipherEmail)
+        return userRepository.findByCipherEmail(cipherEmail)
                 .orElseThrow(() -> {
                     log.warn("Authentication failed: User not found");
                     return new UsernameNotFoundException("User not found");

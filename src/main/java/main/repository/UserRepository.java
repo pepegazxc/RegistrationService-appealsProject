@@ -8,7 +8,7 @@ import java.util.Optional;
 
 
 @Repository
-public interface RegistrationUserRepository extends JpaRepository<UsersEntity, Long> {
+public interface UserRepository extends JpaRepository<UsersEntity, Long> {
     boolean existsByUserIdentifier(String userIdentifier);
     Optional<UsersEntity> findByCipherEmail(String email);
 }
