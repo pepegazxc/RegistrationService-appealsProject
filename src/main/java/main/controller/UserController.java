@@ -4,10 +4,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import main.dto.AuthResponse;
+import main.dto.RefreshTokenResponse;
 import main.dto.UserRequest;
 import main.service.AuthService;
 import main.service.RegistrationService;
 import main.service.jwt.AuthTokenService;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,8 +47,14 @@ public class UserController {
                 );
     }
 
-    @RequestMapping("/token/refresh")
-    public String refreshToken(){
-        return null;
+    @PostMapping("/token/refresh")
+    public ResponseEntity<RefreshTokenResponse> refreshToken(){
+        String token = jwt.generateJwtTokenForCurrentUser();
+        return ResponseEntity.ok(
+                new RefreshTokenResponse(
+                        "Your token has been refreshed successfully",
+                        token
+                )
+        );
     }
 }
