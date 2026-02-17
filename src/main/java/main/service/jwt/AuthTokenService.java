@@ -1,6 +1,7 @@
 package main.service.jwt;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -16,19 +17,13 @@ public class AuthTokenService {
     }
 
     public String generateJwtTokenForCurrentUser(){
-        var authenticate = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authenticate = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authenticate == null || !authenticate.isAuthenticated()) {
-            log.error("Security Context is empty. JWT cannot be generate");
-            throw new IllegalStateException();
-        }
+        checkAuthenticate(authenticate);
 
-        Object principal =authenticate.getPrincipal();
+        Object principal = authenticate.getPrincipal();
 
-        if (!(principal instanceof UserDetails userDetails)){
-            log.error("Principal is not supported={}", principal.getClass().getName());
-            throw new IllegalStateException();
-        }
+        UserDetails userDetails = checkPrincipal(principal);
 
         try {
             String token = jwtService.generateToken(userDetails);
@@ -38,5 +33,21 @@ public class AuthTokenService {
             log.error("Couldn't generate JWT. User identifier={}, {} ", userDetails.getUsername(), e.getMessage(), e);
             throw new IllegalStateException(e);
         }
+    }
+
+    private void checkAuthenticate(Authentication authenticate){
+        if (authenticate == null || !authenticate.isAuthenticated()) {
+            log.error("Security Context is empty. JWT cannot be generate");
+            throw new IllegalStateException();
+        }
+    }
+
+    private UserDetails checkPrincipal(Object principal){
+        if (!(principal instanceof UserDetails userDetails)){
+            log.error("Principal is not supported={}", principal.getClass().getName());
+            throw new IllegalStateException();
+        }
+
+        return  userDetails;
     }
 }
