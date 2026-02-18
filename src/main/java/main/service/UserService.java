@@ -3,6 +3,7 @@ package main.service;
 import lombok.extern.slf4j.Slf4j;
 import main.dto.request.UserRequest;
 import main.entity.UsersEntity;
+import main.exception.UserNotFoundException;
 import main.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -63,7 +64,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findByCipherEmail(cipherEmail)
                 .orElseThrow(() -> {
                     log.warn("Authentication failed: User not found");
-                    return new UsernameNotFoundException("User not found");
+                    return new UserNotFoundException();
                 });
     }
 

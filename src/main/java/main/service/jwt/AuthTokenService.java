@@ -1,6 +1,9 @@
 package main.service.jwt;
 
 import lombok.extern.slf4j.Slf4j;
+import main.exception.EmptySecurityContextException;
+import main.exception.NotSupportedPrincipalException;
+import main.exception.TokenGenerateException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,21 +34,21 @@ public class AuthTokenService {
             return token;
         }catch (Exception e){
             log.error("Couldn't generate JWT. User identifier={}, {} ", userDetails.getUsername(), e.getMessage(), e);
-            throw new IllegalStateException(e);
+            throw new TokenGenerateException();
         }
     }
 
     private void checkAuthenticate(Authentication authenticate){
         if (authenticate == null || !authenticate.isAuthenticated()) {
             log.error("Security Context is empty. JWT cannot be generate");
-            throw new IllegalStateException();
+            throw new EmptySecurityContextException();
         }
     }
 
     private UserDetails checkPrincipal(Object principal){
         if (!(principal instanceof UserDetails userDetails)){
             log.error("Principal is not supported={}", principal.getClass().getName());
-            throw new IllegalStateException();
+            throw new NotSupportedPrincipalException();
         }
 
         return  userDetails;

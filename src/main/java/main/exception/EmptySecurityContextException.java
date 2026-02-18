@@ -1,7 +1,7 @@
 package main.exception;
 
 public class EmptySecurityContextException extends IllegalStateException {
-    public EmptySecurityContextException(String message) {
-        super(message);
+    public EmptySecurityContextException() {
+        super();
     }
 }

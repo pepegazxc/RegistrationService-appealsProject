@@ -6,6 +6,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import main.entity.UsersEntity;
+import main.exception.SigningKeyException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class JwtService {
             return Keys.hmacShaKeyFor(keyBytes);
         }catch (Exception e){
             log.error("Failed to get JWT signing key", e);
-            throw new IllegalStateException(e.getMessage());
+            throw new SigningKeyException();
         }
     }
 }
