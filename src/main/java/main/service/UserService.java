@@ -1,7 +1,7 @@
 package main.service;
 
 import lombok.extern.slf4j.Slf4j;
-import main.dto.UserRequest;
+import main.dto.request.UserRequest;
 import main.entity.UsersEntity;
 import main.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
