@@ -52,8 +52,12 @@ public class UserService implements UserDetailsService {
 
         UsersEntity user = addNewUser(request);
 
-        userRepository.save(user);
-        log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
+        try {
+            userRepository.save(user);
+            log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
+        }catch (DataIntegrityViolationException ex){
+            throw handleExistingUserException(ex);
+        }
     }
 
     private String generateUserIdentifier(){
@@ -85,17 +89,15 @@ public class UserService implements UserDetailsService {
     }
 
     private RuntimeException handleExistingUserException(DataIntegrityViolationException ex){
-
         Throwable root = ExceptionUtils.getRootCause(ex);
 
         if (root instanceof ConstraintViolationException constraint){
-            String constraintName = constraint.getConstraintName();
-
-            if ("cipher_email".equals(constraintName)){
-                throw new IllegalStateException("That email already exist");
+            switch (constraint.getConstraintName()){
+                case "user_identifier" -> throw new IllegalStateException();
+                case "cipher_email" -> throw new IllegalStateException();
+                case "cipher_phone_number" -> throw new IllegalStateException();
             }
         }
-
         return new RuntimeException("Reg failed");
 
     }
