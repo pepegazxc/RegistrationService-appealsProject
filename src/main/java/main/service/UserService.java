@@ -5,12 +5,16 @@ import main.dto.request.UserRequest;
 import main.entity.UsersEntity;
 import main.exception.UserNotFoundException;
 import main.repository.UserRepository;
+import org.flywaydb.core.internal.util.ExceptionUtils;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.util.ExceptionUtil;
 
 @Service
 @Slf4j
@@ -78,6 +82,22 @@ public class UserService implements UserDetailsService {
                 .hashPassword(encoder.encode(request.getPassword()))
                 .roles("ROLE_USER")
                 .build();
+    }
+
+    private RuntimeException handleExistingUserException(DataIntegrityViolationException ex){
+
+        Throwable root = ExceptionUtils.getRootCause(ex);
+
+        if (root instanceof ConstraintViolationException constraint){
+            String constraintName = constraint.getConstraintName();
+
+            if ("cipher_email".equals(constraintName)){
+                throw new IllegalStateException("That email already exist");
+            }
+        }
+
+        return new RuntimeException("Reg failed");
+
     }
 
 }
