@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(SigningKeyException.class)
-    public ResponseEntity<ExceptionResponse> handleNotSupportedPrincipal(SigningKeyException ex){
+    public ResponseEntity<ExceptionResponse> handleSigningKeyException(SigningKeyException ex){
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionResponse(
                 "Failed to generate JWT token. Please try again.",
                 ex.getMessage()
@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleNotSupportedPrincipal(UserNotFoundException ex){
+    public ResponseEntity<ExceptionResponse> handleUserNotFoundException(UserNotFoundException ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResponse(
                 "Invalid email or password.",
                 ex.getMessage()
@@ -43,9 +43,33 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TokenGenerateException.class)
-    public ResponseEntity<ExceptionResponse> handleNotSupportedPrincipal(TokenGenerateException ex){
+    public ResponseEntity<ExceptionResponse> handleTokenGenerateException(TokenGenerateException ex){
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionResponse(
                 "Failed to generate JWT token. Please try again.",
+                ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(UserIdentifierException.class)
+    public ResponseEntity<ExceptionResponse> handleUserIdentifierException(UserIdentifierException ex){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionResponse(
+                "Failed to generate unique user identifier. Please try again.",
+                ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(PhoneNumberAlreadyExistsException.class)
+    public ResponseEntity<ExceptionResponse> handlePhoneNumberAlreadyExistsException(PhoneNumberAlreadyExistsException ex){
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionResponse(
+                "User with that phone already exist. Please enter another phone number.",
+                ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ExceptionResponse> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex){
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionResponse(
+                "User with that email  exist. Please enter another email.",
                 ex.getMessage()
         ));
     }

@@ -3,6 +3,9 @@ package main.service;
 import lombok.extern.slf4j.Slf4j;
 import main.dto.request.UserRequest;
 import main.entity.UsersEntity;
+import main.exception.EmailAlreadyExistsException;
+import main.exception.PhoneNumberAlreadyExistsException;
+import main.exception.UserIdentifierException;
 import main.exception.UserNotFoundException;
 import main.repository.UserRepository;
 import org.flywaydb.core.internal.util.ExceptionUtils;
@@ -93,9 +96,9 @@ public class UserService implements UserDetailsService {
 
         if (root instanceof ConstraintViolationException constraint){
             switch (constraint.getConstraintName()){
-                case "user_identifier" -> throw new IllegalStateException();
-                case "cipher_email" -> throw new IllegalStateException();
-                case "cipher_phone_number" -> throw new IllegalStateException();
+                case "user_identifier" -> throw new UserIdentifierException();
+                case "cipher_email" -> throw new EmailAlreadyExistsException();
+                case "cipher_phone_number" -> throw new PhoneNumberAlreadyExistsException();
             }
         }
         return new RuntimeException("Reg failed");
