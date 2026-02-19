@@ -73,4 +73,12 @@ public class GlobalExceptionHandler {
                 ex.getMessage()
         ));
     }
+
+    @ExceptionHandler(RegistrationFailedException.class)
+    public ResponseEntity<ExceptionResponse> handleRegistrationFailedException(RegistrationFailedException ex){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionResponse(
+                "An error occurred during registration. Please try to registering again.",
+                ex.getMessage()
+        ));
+    }
 }

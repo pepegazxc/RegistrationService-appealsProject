@@ -3,10 +3,7 @@ package main.service;
 import lombok.extern.slf4j.Slf4j;
 import main.dto.request.UserRequest;
 import main.entity.UsersEntity;
-import main.exception.EmailAlreadyExistsException;
-import main.exception.PhoneNumberAlreadyExistsException;
-import main.exception.UserIdentifierException;
-import main.exception.UserNotFoundException;
+import main.exception.*;
 import main.repository.UserRepository;
 import org.flywaydb.core.internal.util.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
@@ -101,7 +98,7 @@ public class UserService implements UserDetailsService {
                 case "cipher_phone_number" -> throw new PhoneNumberAlreadyExistsException();
             }
         }
-        return new RuntimeException("Reg failed");
+        return new RegistrationFailedException();
 
     }
 
