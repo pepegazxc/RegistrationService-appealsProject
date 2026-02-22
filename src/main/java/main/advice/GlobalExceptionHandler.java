@@ -63,28 +63,35 @@ public class GlobalExceptionHandler {
             String constraintName = constraint.getConstraintName();
 
             if ("23505".equals(sqlState)) {
-
-                if ("users_cipher_email_key".equals(constraintName)) {
-                    return ResponseEntity.status(HttpStatus.CONFLICT)
-                            .body(new ExceptionResponse(
-                                    "User with that email exists.",
-                                    ex.getMessage()));
-                }
-                if ("users_cipher_phone_number_key".equals(constraintName)){
-                    return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionResponse(
-                            "User with that phone already exist. Please enter another phone number.",
-                            ex.getMessage()
-                    ));
-                }
-                if ("users_identifier_key".equals(constraintName)){
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionResponse(
-                            "Failed to generate unique user identifier. Please try again.",
-                            ex.getMessage()
-                    ));
-                }
+                return handleConstraint(constraintName, ex);
             }
         }
 
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ExceptionResponse(
+                        "An error occurred during registration. Please try to registering again.",
+                        ex.getMessage()));
+    }
+
+    private ResponseEntity<ExceptionResponse> handleConstraint(String constraintName, DataIntegrityViolationException ex){
+        if ("users_cipher_email_key".equals(constraintName)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ExceptionResponse(
+                            "User with that email exists.",
+                            ex.getMessage()));
+        }
+        if ("users_cipher_phone_number_key".equals(constraintName)){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionResponse(
+                    "User with that phone already exist. Please enter another phone number.",
+                    ex.getMessage()
+            ));
+        }
+        if ("users_identifier_key".equals(constraintName)){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionResponse(
+                    "Failed to generate unique user identifier. Please try again.",
+                    ex.getMessage()
+            ));
+        }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ExceptionResponse(
                         "An error occurred during registration. Please try to registering again.",
