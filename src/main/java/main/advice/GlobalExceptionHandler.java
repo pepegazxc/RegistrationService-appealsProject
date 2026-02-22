@@ -2,6 +2,9 @@ package main.advice;
 
 import main.dto.response.ExceptionResponse;
 import main.exception.*;
+import org.flywaydb.core.internal.util.ExceptionUtils;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -50,35 +53,41 @@ public class GlobalExceptionHandler {
         ));
     }
 
-    @ExceptionHandler(UserIdentifierException.class)
-    public ResponseEntity<ExceptionResponse> handleUserIdentifierException(UserIdentifierException ex){
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionResponse(
-                "Failed to generate unique user identifier. Please try again.",
-                ex.getMessage()
-        ));
-    }
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ExceptionResponse> handleIntegrityException(DataIntegrityViolationException ex){
+        Throwable cause = ex.getCause();
 
-    @ExceptionHandler(PhoneNumberAlreadyExistsException.class)
-    public ResponseEntity<ExceptionResponse> handlePhoneNumberAlreadyExistsException(PhoneNumberAlreadyExistsException ex){
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionResponse(
-                "User with that phone already exist. Please enter another phone number.",
-                ex.getMessage()
-        ));
-    }
+        if (cause instanceof org.hibernate.exception.ConstraintViolationException constraint){
 
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<ExceptionResponse> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex){
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionResponse(
-                "User with that email  exist. Please enter another email.",
-                ex.getMessage()
-        ));
-    }
+            String sqlState = constraint.getSQLException().getSQLState();
+            String constraintName = constraint.getConstraintName();
 
-    @ExceptionHandler(RegistrationFailedException.class)
-    public ResponseEntity<ExceptionResponse> handleRegistrationFailedException(RegistrationFailedException ex){
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionResponse(
-                "An error occurred during registration. Please try to registering again.",
-                ex.getMessage()
-        ));
+            if ("23505".equals(sqlState)) {
+
+                if ("users_cipher_email_key".equals(constraintName)) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
+                            .body(new ExceptionResponse(
+                                    "User with that email exists.",
+                                    ex.getMessage()));
+                }
+                if ("users_cipher_phone_number_key".equals(constraintName)){
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionResponse(
+                            "User with that phone already exist. Please enter another phone number.",
+                            ex.getMessage()
+                    ));
+                }
+                if ("users_identifier_key".equals(constraintName)){
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionResponse(
+                            "Failed to generate unique user identifier. Please try again.",
+                            ex.getMessage()
+                    ));
+                }
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ExceptionResponse(
+                        "An error occurred during registration. Please try to registering again.",
+                        ex.getMessage()));
     }
 }

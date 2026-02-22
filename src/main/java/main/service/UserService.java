@@ -52,12 +52,8 @@ public class UserService implements UserDetailsService {
 
         UsersEntity user = addNewUser(request);
 
-        try {
-            userRepository.save(user);
-            log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
-        }catch (DataIntegrityViolationException ex){
-            throw handleExistingUserException(ex);
-        }
+        userRepository.save(user);
+        log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
     }
 
     private String generateUserIdentifier(){
@@ -86,20 +82,6 @@ public class UserService implements UserDetailsService {
                 .hashPassword(encoder.encode(request.getPassword()))
                 .roles("ROLE_USER")
                 .build();
-    }
-
-    private RuntimeException handleExistingUserException(DataIntegrityViolationException ex){
-        Throwable root = ExceptionUtils.getRootCause(ex);
-
-        if (root instanceof ConstraintViolationException constraint){
-            switch (constraint.getConstraintName()){
-                case "user_identifier" -> throw new UserIdentifierException();
-                case "cipher_email" -> throw new EmailAlreadyExistsException();
-                case "cipher_phone_number" -> throw new PhoneNumberAlreadyExistsException();
-            }
-        }
-        return new RegistrationFailedException();
-
     }
 
 }
