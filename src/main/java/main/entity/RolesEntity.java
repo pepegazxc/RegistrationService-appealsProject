@@ -19,7 +19,7 @@ public class RolesEntity {
     @Id
     private Long id;
 
-    @Column(name = "role_name")
+    @Column(name = "role_name", nullable = true)
     private String roleName;
 
 }

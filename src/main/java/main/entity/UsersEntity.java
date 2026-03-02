@@ -1,7 +1,9 @@
 package main.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -18,6 +20,8 @@ import java.util.List;
 @Table(name = "users")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UsersEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,53 +51,7 @@ public class UsersEntity {
     @Column(name = "updated_at")
     Timestamp updatedAt;
 
-    String roles;
-
-    public static class Builder{
-        UsersEntity users = new UsersEntity();
-
-        public Builder name(String name){
-            users.name = name;
-            return this;
-        }
-
-        public Builder surname(String surname){
-            users.surname = surname;
-            return this;
-        }
-
-        public Builder userIdentifier(String userIdentifier){
-            users.userIdentifier = userIdentifier;
-            return this;
-        }
-
-        public Builder cipherEmail(String cipherEmail){
-            users.cipherEmail = cipherEmail;
-            return this;
-        }
-
-        public Builder cipherPhoneNumber(String cipherPhoneNumber){
-            users.cipherPhoneNumber = cipherPhoneNumber;
-            return this;
-        }
-
-        public Builder hashPassword(String hashPassword){
-            users.hashPassword = hashPassword;
-            return this;
-        }
-
-        public Builder createdAt(Timestamp createdAt){
-            users.createdAt = createdAt;
-            return this;
-        }
-
-        public Builder roles(String roles){
-            users.roles = roles;
-            return this;
-        }
-
-        public UsersEntity build(){
-            return users;
-        }
-    }
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = true)
+    RolesEntity role;
 }
