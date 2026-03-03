@@ -1,6 +1,7 @@
 package main.dto.request
 
 import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import org.jetbrains.annotations.NotNull
 import org.springframework.validation.annotation.Validated
@@ -19,5 +20,8 @@ data class UserRequest(
     val password: String,
     @field:NotNull
     @field:Size(min = 10)
-    val phoneNumber: String
+    val phoneNumber: String,
+    @field:NotNull
+    @field:Pattern(regexp = "^(user|admin|major)$", message = "Role must be either ROLE_USER or ROLE_ADMIN")
+    val role: String
 )
