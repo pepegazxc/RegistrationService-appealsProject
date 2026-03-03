@@ -43,7 +43,6 @@ public class UserService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUserIdentifier())
                 .password(user.getHashPassword())
-                .authorities(user.getRoles())
                 .build();
     }
 
@@ -73,14 +72,13 @@ public class UserService implements UserDetailsService {
     }
 
     private UsersEntity addNewUser(UserRequest request){
-        return new UsersEntity.Builder()
+        return UsersEntity.builder()
                 .name(request.getName())
                 .surname(request.getSurname())
                 .userIdentifier(generateUserIdentifier())
                 .cipherEmail(cipher.encrypt(request.getEmail()))
                 .cipherPhoneNumber(cipher.encrypt(request.getPhoneNumber()))
                 .hashPassword(encoder.encode(request.getPassword()))
-                .roles("ROLE_USER")
                 .build();
     }
 
