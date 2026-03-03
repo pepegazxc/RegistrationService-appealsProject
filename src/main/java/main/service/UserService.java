@@ -2,19 +2,19 @@ package main.service;
 
 import lombok.extern.slf4j.Slf4j;
 import main.dto.request.UserRequest;
+import main.entity.RolesEntity;
 import main.entity.UsersEntity;
 import main.exception.*;
+import main.repository.RolesRepository;
 import main.repository.UserRepository;
-import org.flywaydb.core.internal.util.ExceptionUtils;
-import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.databind.util.ExceptionUtil;
+
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -24,12 +24,14 @@ public class UserService implements UserDetailsService {
     private final CipherService cipher;
     private final PasswordEncoder encoder;
     private final UserIdentifierService userIdentifier;
+    private final RolesRepository rolesRepository;
 
-    public UserService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier) {
+    public UserService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, RolesRepository rolesRepository) {
         this.userRepository = userRepository;
         this.cipher = cipher;
         this.encoder = encoder;
         this.userIdentifier = userIdentifier;
+        this.rolesRepository = rolesRepository;
     }
 
 
@@ -43,13 +45,17 @@ public class UserService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUserIdentifier())
                 .password(user.getHashPassword())
+                .roles(user.getRole().getRoleName())
                 .build();
     }
 
     @Transactional
     public void registration(UserRequest request){
 
-        UsersEntity user = addNewUser(request);
+        RolesEntity role = findRole(request)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        UsersEntity user = addNewUser(request, role);
 
         userRepository.save(user);
         log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
@@ -71,7 +77,7 @@ public class UserService implements UserDetailsService {
                 });
     }
 
-    private UsersEntity addNewUser(UserRequest request){
+    private UsersEntity addNewUser(UserRequest request, RolesEntity role){
         return UsersEntity.builder()
                 .name(request.getName())
                 .surname(request.getSurname())
@@ -79,7 +85,12 @@ public class UserService implements UserDetailsService {
                 .cipherEmail(cipher.encrypt(request.getEmail()))
                 .cipherPhoneNumber(cipher.encrypt(request.getPhoneNumber()))
                 .hashPassword(encoder.encode(request.getPassword()))
+                .role(role)
                 .build();
+    }
+
+    private Optional<RolesEntity> findRole(UserRequest request){
+        return rolesRepository.findByRoleName(request.getRole());
     }
 
 }
