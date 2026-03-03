@@ -90,7 +90,11 @@ public class UserService implements UserDetailsService {
     }
 
     private Optional<RolesEntity> findRole(UserRequest request){
-        return rolesRepository.findByRoleName(request.getRole());
+        return rolesRepository.findByRoleName(checkOnRole(request));
+    }
+
+    private String checkOnRole(UserRequest request){
+        return "ROLE_" + request.getRole().toUpperCase();
     }
 
 }
