@@ -94,7 +94,7 @@ public class UserService implements UserDetailsService {
     }
 
     private String checkOnRole(UserRequest request){
-        return "ROLE_" + request.getRole().toUpperCase();
+        return "ROLE_" + request.getRole().toString().toUpperCase();
     }
 
 }
