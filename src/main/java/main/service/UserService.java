@@ -52,7 +52,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void registration(UserRequest request){
 
-        RolesEntity role = findRole(request)
+        RolesEntity role = rolesRepository.findByRoleName("ROLE_" + request.getRole().toString().toUpperCase())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         UsersEntity user = addNewUser(request, role);
@@ -90,11 +90,7 @@ public class UserService implements UserDetailsService {
     }
 
     private Optional<RolesEntity> findRole(UserRequest request){
-        return rolesRepository.findByRoleName(checkOnRole(request));
-    }
-
-    private String checkOnRole(UserRequest request){
-        return "ROLE_" + request.getRole().toString().toUpperCase();
+        return rolesRepository.findByRoleName("ROLE_" + request.getRole().toString().toUpperCase());
     }
 
 }

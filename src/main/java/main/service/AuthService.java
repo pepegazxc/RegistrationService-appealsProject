@@ -38,7 +38,7 @@ public class AuthService {
             log.info("Authentication succeeded via auto-auth for principal {}" , auth.getName());
 
         }catch (AuthenticationException ex){
-            log.warn("Auth-Authentication failed");
+            log.warn("Auth-Authentication failed: {}", ex.getMessage());
             throw ex;
         }
     }
