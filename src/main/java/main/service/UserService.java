@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.management.relation.Role;
 import java.util.Optional;
 
 @Service
@@ -52,8 +53,8 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void registration(UserRequest request){
 
-        RolesEntity role = rolesRepository.findByRoleName("ROLE_" + request.getRole().toString().toUpperCase())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+        RolesEntity role = findRole(request)
+                .orElseThrow(() -> new IllegalStateException("Role not found"));
 
         UsersEntity user = addNewUser(request, role);
 
@@ -90,7 +91,7 @@ public class UserService implements UserDetailsService {
     }
 
     private Optional<RolesEntity> findRole(UserRequest request){
-        return rolesRepository.findByRoleName("ROLE_" + request.getRole().toString().toUpperCase());
+        return rolesRepository.findByRoleName(request.getRole().toString().trim().toUpperCase());
     }
 
 }
