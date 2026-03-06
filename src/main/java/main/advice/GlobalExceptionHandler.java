@@ -73,6 +73,15 @@ public class GlobalExceptionHandler {
                         ex.getMessage()));
     }
 
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleRoleNotFound(RoleNotFoundException ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ExceptionResponse(
+                        "Role not found. Please choose user, admnin or mayor",
+                        ex.getMessage()
+                ));
+    }
+
     private ResponseEntity<ExceptionResponse> handleConstraint(String constraintName, DataIntegrityViolationException ex){
         if ("users_cipher_email_key".equals(constraintName)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -97,4 +106,6 @@ public class GlobalExceptionHandler {
                         "An error occurred during registration. Please try to registering again.",
                         ex.getMessage()));
     }
+
+
 }

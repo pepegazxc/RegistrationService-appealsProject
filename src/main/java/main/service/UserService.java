@@ -54,7 +54,7 @@ public class UserService implements UserDetailsService {
     public void registration(UserRequest request){
 
         RolesEntity role = findRole(request)
-                .orElseThrow(() -> new IllegalStateException("Role not found"));
+                .orElseThrow(() -> new RoleNotFoundException());
 
         UsersEntity user = addNewUser(request, role);
 
