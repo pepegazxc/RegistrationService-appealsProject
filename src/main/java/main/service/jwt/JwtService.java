@@ -24,17 +24,22 @@ public class JwtService {
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        if (userDetails instanceof UsersEntity customUserDetails) {
-            claims.put("roles", customUserDetails.getRole().getRoleName());
-        }
+        claims.put(
+                "role",
+                userDetails.getAuthorities()
+                        .stream().map(a -> a.getAuthority())
+                        .toList()
+        );
 
         return generateToken(claims, userDetails);
     }
 
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
+        return Jwts.builder()
+                .addClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 300000))
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
     }
 
