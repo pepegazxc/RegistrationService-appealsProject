@@ -25,31 +25,37 @@ public class UsersEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    String name;
+    private String name;
 
-    String surname;
+    private String surname;
 
     @Column(name = "user_identifier")
-    String userIdentifier;
+    private String userIdentifier;
 
     @Column(name = "cipher_email")
-    String cipherEmail;
+    private String cipherEmail;
 
     @Column(name = "cipher_phone_number")
-    String cipherPhoneNumber;
+    private String cipherPhoneNumber;
 
     @Column(name = "hash_password")
-    String hashPassword;
+    private String hashPassword;
 
     @CreationTimestamp
     @Column(name = "created_at")
-    Timestamp createdAt;
+    private Timestamp createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    Timestamp updatedAt;
+    private Timestamp updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = true)
-    RolesEntity role;
+    private RolesEntity role;
+
+    @Column(name = "is_email_verified")
+    private Boolean isEmailVerified;
+
+    @Column(name = "is_active")
+    private Boolean isActive;
 }
