@@ -26,13 +26,15 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder encoder;
     private final UserIdentifierService userIdentifier;
     private final RolesRepository rolesRepository;
+    private final EmailVerificationService emailService;
 
-    public UserService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, RolesRepository rolesRepository) {
+    public UserService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, RolesRepository rolesRepository, EmailVerificationService emailService) {
         this.userRepository = userRepository;
         this.cipher = cipher;
         this.encoder = encoder;
         this.userIdentifier = userIdentifier;
         this.rolesRepository = rolesRepository;
+        this.emailService = emailService;
     }
 
 
@@ -52,13 +54,13 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void registration(UserRequest request){
-
         RolesEntity role = findRole(request);
-
         UsersEntity user = addNewUser(request, role);
 
         userRepository.save(user);
         log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
+
+        String token = emailService.generateTokenForEmail(user);
     }
 
     private String generateUserIdentifier(){

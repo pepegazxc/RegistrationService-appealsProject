@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "email_verification_tokens")
@@ -23,13 +23,13 @@ public class EmailVerificationTokensEntity {
     private UsersEntity user;
 
     @Column(name = "hash_token")
-    private String hashToken;
+    private String token;
 
     @Column(name = "expires_at")
-    private Timestamp expiresAt;
+    private LocalDateTime expiresAt;
 
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     private Boolean used;
 }
