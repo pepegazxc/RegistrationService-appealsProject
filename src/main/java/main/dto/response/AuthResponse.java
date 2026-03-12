@@ -1,4 +1,4 @@
 package main.dto.response;
 
-public record AuthResponse(String message, String token) {
+public record AuthResponse(String message, String emailMessage) {
 }

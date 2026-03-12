@@ -34,13 +34,11 @@ public class UserController {
         userService.registration(request);
         auth.autoAuth(request.getEmail(), request.getPassword(), httpRequest);
 
-        String token = jwt.generateJwtTokenForCurrentUser();
-
         log.info("Registration success email={}", request.getEmail());
         return ResponseEntity.ok(
                         new AuthResponse(
                                 "User has registered successfully",
-                                token
+                                "Please. check your email for confirmation"
                         )
                 );
     }
