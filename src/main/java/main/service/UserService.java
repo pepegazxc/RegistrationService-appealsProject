@@ -4,9 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import main.dto.request.UserRequest;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
+import main.event.UserRegisteredEvent;
 import main.exception.*;
 import main.repository.RolesRepository;
 import main.repository.UserRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,14 +29,16 @@ public class UserService implements UserDetailsService {
     private final UserIdentifierService userIdentifier;
     private final RolesRepository rolesRepository;
     private final EmailVerificationService emailService;
+    private final ApplicationEventPublisher publisher;
 
-    public UserService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, RolesRepository rolesRepository, EmailVerificationService emailService) {
+    public UserService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, RolesRepository rolesRepository, EmailVerificationService emailService, ApplicationEventPublisher publisher) {
         this.userRepository = userRepository;
         this.cipher = cipher;
         this.encoder = encoder;
         this.userIdentifier = userIdentifier;
         this.rolesRepository = rolesRepository;
         this.emailService = emailService;
+        this.publisher = publisher;
     }
 
 
@@ -61,6 +65,12 @@ public class UserService implements UserDetailsService {
         log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
 
         String token = emailService.generateTokenForEmail(user);
+
+        publisher.publishEvent(new UserRegisteredEvent(
+                decryptEmail(user.getCipherEmail()),
+                token
+                )
+        );
     }
 
     private String generateUserIdentifier(){
@@ -94,6 +104,10 @@ public class UserService implements UserDetailsService {
     private RolesEntity findRole(UserRequest request){
         return rolesRepository.findByRoleName(request.getRole().toString().trim().toUpperCase())
                 .orElseThrow(() -> new RoleNotFoundException());
+    }
+
+    private String decryptEmail(String email){
+        return cipher.decrypt(email);
     }
 
 }
