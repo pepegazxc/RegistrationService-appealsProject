@@ -43,3 +43,6 @@ Jasypt:
 
 token:
   key: ${JWT_KEY}
+
+app:
+  url: http://localhost:8081

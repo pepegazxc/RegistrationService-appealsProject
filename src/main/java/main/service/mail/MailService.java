@@ -14,7 +14,7 @@ public class MailService implements MailSender{
     }
 
     @Override
-    public void SendMail(String to, String subject, String text) {
+    public void sendMail(String to, String subject, String text) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(to);
         mailMessage.setSubject(subject);
