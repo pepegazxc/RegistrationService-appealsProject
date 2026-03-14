@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import main.dto.response.AuthResponse;
+import main.dto.response.EmailConfirmationResponse;
 import main.dto.response.RefreshTokenResponse;
 import main.dto.request.UserRequest;
 import main.service.AuthService;
@@ -46,18 +47,24 @@ public class UserController {
 
     @PostMapping("/token/refresh")
     public ResponseEntity<RefreshTokenResponse> refreshToken(){
-        String token = jwt.generateJwtTokenForCurrentUser();
+        String jwtToken = jwt.generateJwtTokenForCurrentUser();
         return ResponseEntity.ok(
                 new RefreshTokenResponse(
                         "Your token has been refreshed successfully",
-                        token
+                        jwtToken
                 )
         );
     }
 
-    @GetMapping("/mail/confirm?token=")
-    public ResponseEntity confirmMail(@RequestParam String token){
-        email.confirmUserEmail(token);
-        return ResponseEntity.ok().build();
+    @GetMapping("/mail/confirm")
+    public ResponseEntity<EmailConfirmationResponse> confirmMail(@RequestParam String mailToken){
+        email.confirmUserEmail(mailToken);
+        String jwtToken = jwt.generateJwtTokenForCurrentUser();
+        return ResponseEntity.ok(
+                new EmailConfirmationResponse(
+                        "Your email has been successfully confirmed",
+                        jwtToken
+                )
+        );
     }
 }
