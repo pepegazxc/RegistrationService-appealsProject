@@ -7,6 +7,7 @@ import main.dto.response.AuthResponse;
 import main.dto.response.RefreshTokenResponse;
 import main.dto.request.UserRequest;
 import main.service.AuthService;
+import main.service.EmailVerificationService;
 import main.service.UserService;
 import main.service.jwt.AuthTokenService;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +20,13 @@ public class UserController {
     private final UserService userService;
     private final AuthService auth;
     private final AuthTokenService jwt;
+    private final EmailVerificationService email;
 
-    public UserController(UserService userService, AuthService auth, AuthTokenService jwt) {
+    public UserController(UserService userService, AuthService auth, AuthTokenService jwt, EmailVerificationService email) {
         this.userService = userService;
         this.auth = auth;
         this.jwt = jwt;
+        this.email = email;
     }
 
     @PostMapping("/registration")
@@ -52,8 +55,9 @@ public class UserController {
         );
     }
 
-    @PostMapping("/mail/confirm?token=")
-    public void confirmMail(@RequestParam String token){
-
+    @GetMapping("/mail/confirm?token=")
+    public ResponseEntity confirmMail(@RequestParam String token){
+        email.confirmUserEmail(token);
+        return ResponseEntity.ok().build();
     }
 }
