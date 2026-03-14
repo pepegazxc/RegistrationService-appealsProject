@@ -10,9 +10,7 @@ import main.service.AuthService;
 import main.service.UserService;
 import main.service.jwt.AuthTokenService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -52,5 +50,10 @@ public class UserController {
                         token
                 )
         );
+    }
+
+    @PostMapping("/mail/confirm?token=")
+    public void confirmMail(@RequestParam String token){
+
     }
 }
