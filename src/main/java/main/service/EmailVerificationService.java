@@ -46,6 +46,7 @@ public class EmailVerificationService {
         return EmailVerificationTokensEntity.builder()
                 .user(user)
                 .token(generateToken())
+                .createdAt(LocalDateTime.now())
                 .expiresAt(LocalDateTime.now().plusDays(7))
                 .used(false)
                 .build();

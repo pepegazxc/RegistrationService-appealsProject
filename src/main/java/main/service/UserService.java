@@ -98,6 +98,8 @@ public class UserService implements UserDetailsService {
                 .cipherPhoneNumber(cipher.encrypt(request.getPhoneNumber()))
                 .hashPassword(encoder.encode(request.getPassword()))
                 .role(role)
+                .isEmailVerified(false)
+                .isActive(true)
                 .build();
     }
 
