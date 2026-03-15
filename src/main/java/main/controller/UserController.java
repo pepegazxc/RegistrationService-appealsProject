@@ -57,8 +57,8 @@ public class UserController {
     }
 
     @GetMapping("/mail/confirm")
-    public ResponseEntity<EmailConfirmationResponse> confirmMail(@RequestParam String mailToken){
-        email.confirmUserEmail(mailToken);
+    public ResponseEntity<EmailConfirmationResponse> confirmMail(@RequestParam String token){
+        email.confirmUserEmail(token);
         String jwtToken = jwt.generateJwtTokenForCurrentUser();
         return ResponseEntity.ok(
                 new EmailConfirmationResponse(

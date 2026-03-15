@@ -20,7 +20,7 @@ public class Config {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST,"/registration","/login").permitAll()
+                        .requestMatchers("/registration","/login","/mail/confirm").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
