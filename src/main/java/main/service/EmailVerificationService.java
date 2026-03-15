@@ -32,14 +32,13 @@ public class EmailVerificationService {
     @Transactional
     public void confirmUserEmail(String token){
         EmailVerificationTokensEntity email = searchByToken(token);
+        checkEmailToken(email);
 
         UsersEntity user = email.getUser();
+        checkEmailOnConfirm(user);
 
         confirmEmail(user);
         tokenIsUsed(email);
-
-        emailVerificationRepository.flush();
-        userRepository.flush();
     }
 
     private EmailVerificationTokensEntity buildEmailTokenEntity(UsersEntity user){
@@ -50,6 +49,15 @@ public class EmailVerificationService {
                 .expiresAt(LocalDateTime.now().plusDays(7))
                 .used(false)
                 .build();
+    }
+
+    private void checkEmailToken(EmailVerificationTokensEntity email){
+        if (email.getExpiresAt().isBefore(LocalDateTime.now())) throw  new IllegalStateException();
+        if (email.getUsed()) throw new IllegalStateException();
+    }
+
+    private void checkEmailOnConfirm(UsersEntity user){
+        if (user.getIsEmailVerified()) throw new IllegalStateException();
     }
 
     private void confirmEmail(UsersEntity user){
