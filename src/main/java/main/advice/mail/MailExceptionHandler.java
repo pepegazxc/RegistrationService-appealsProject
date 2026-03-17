@@ -4,6 +4,7 @@ import main.dto.response.ExceptionResponse;
 import main.exception.email.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailSendException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -45,6 +46,16 @@ public class MailExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(
                 new ExceptionResponse(
                         "Your email has already been verified",
+                        ex.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(MailSendException.class)
+    public ResponseEntity<ExceptionResponse> handeMailSend(MailSendException ex){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ExceptionResponse(
+                        "Something went wrong while mail sending",
                         ex.getMessage()
                 )
         );
