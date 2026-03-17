@@ -1,4 +1,4 @@
-package main.exception;
+package main.exception.security;
 
 public class TokenGenerateException extends RuntimeException {
     public TokenGenerateException() {

@@ -1,9 +1,12 @@
 package main.advice;
 
 import main.dto.response.ExceptionResponse;
-import main.exception.*;
-import org.flywaydb.core.internal.util.ExceptionUtils;
-import org.hibernate.exception.ConstraintViolationException;
+import main.exception.security.EmptySecurityContextException;
+import main.exception.security.NotSupportedPrincipalException;
+import main.exception.security.SigningKeyException;
+import main.exception.security.TokenGenerateException;
+import main.exception.user.RoleNotFoundException;
+import main.exception.user.UserNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

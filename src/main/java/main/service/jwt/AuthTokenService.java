@@ -1,9 +1,9 @@
 package main.service.jwt;
 
 import lombok.extern.slf4j.Slf4j;
-import main.exception.EmptySecurityContextException;
-import main.exception.NotSupportedPrincipalException;
-import main.exception.TokenGenerateException;
+import main.exception.security.EmptySecurityContextException;
+import main.exception.security.NotSupportedPrincipalException;
+import main.exception.security.TokenGenerateException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;

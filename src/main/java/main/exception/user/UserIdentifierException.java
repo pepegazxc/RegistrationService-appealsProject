@@ -1,4 +1,4 @@
-package main.exception;
+package main.exception.user;
 
 public class UserIdentifierException extends RuntimeException {
     public UserIdentifierException( ) {

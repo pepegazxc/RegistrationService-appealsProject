@@ -5,7 +5,8 @@ import main.dto.request.UserRequest;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
 import main.event.UserRegisteredEvent;
-import main.exception.*;
+import main.exception.user.RoleNotFoundException;
+import main.exception.user.UserNotFoundException;
 import main.repository.RolesRepository;
 import main.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
@@ -15,9 +16,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.management.relation.Role;
-import java.util.Optional;
 
 @Service
 @Slf4j
