@@ -3,6 +3,10 @@ package main.service;
 import lombok.extern.slf4j.Slf4j;
 import main.entity.EmailVerificationTokensEntity;
 import main.entity.UsersEntity;
+import main.exception.EmailTokenNotFoundException;
+import main.exception.ExpiredEmailTokenException;
+import main.exception.UsedEmailTokenException;
+import main.exception.VerifiedUserEmailException;
 import main.repository.EmailVerificationTokensRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,18 +58,18 @@ public class EmailVerificationService {
     private void checkEmailToken(EmailVerificationTokensEntity email){
         if (email.getExpiresAt().isBefore(LocalDateTime.now())){
             log.warn("Email verification token for user {} is expired", email.getUser().getUserIdentifier());
-            throw  new IllegalStateException();
+            throw new ExpiredEmailTokenException();
         }
         if (email.getUsed()) {
             log.warn("Email verification token for user {} is used", email.getUser().getUserIdentifier());
-            throw new IllegalStateException();
+            throw new UsedEmailTokenException();
         }
     }
 
     private void checkEmailOnConfirm(UsersEntity user){
         if (user.getIsEmailVerified()){
             log.warn("User {} has already verified his email", user.getUserIdentifier());
-            throw new IllegalStateException();
+            throw new VerifiedUserEmailException();
         }
     }
 
@@ -81,7 +85,7 @@ public class EmailVerificationService {
         EmailVerificationTokensEntity email = emailVerificationRepository.searchByToken(token)
                 .orElseThrow(() ->{
                     log.warn("Verification token {} not found", token);
-                    throw new IllegalStateException();
+                    throw new EmailTokenNotFoundException();
                 });
 
         return email;
