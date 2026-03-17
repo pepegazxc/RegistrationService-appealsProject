@@ -24,7 +24,7 @@ public class UserExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleRoleNotFound(RoleNotFoundException ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ExceptionResponse(
-                        "Role not found. Please choose user, admnin or mayor",
+                        "Role not found. Please choose user, admin or mayor",
                         ex.getMessage()
                 ));
     }
