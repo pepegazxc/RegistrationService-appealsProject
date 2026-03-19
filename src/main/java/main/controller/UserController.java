@@ -67,4 +67,9 @@ public class UserController {
                 )
         );
     }
+
+    @GetMapping("")
+    public ResponseEntity confirmMailForAdmin(){
+        return null;
+    }
 }
