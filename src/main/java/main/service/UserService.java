@@ -1,6 +1,7 @@
 package main.service;
 
 import lombok.extern.slf4j.Slf4j;
+import main.dto.enums.RolesEnum;
 import main.dto.request.UserRequest;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
@@ -56,6 +57,10 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void registration(UserRequest request){
+        if (request.getRole() == RolesEnum.admin){
+            handleAdminRegistration(request);
+        }
+
         RolesEntity role = findRole(request);
         UsersEntity user = addNewUser(request, role);
 
@@ -69,6 +74,10 @@ public class UserService implements UserDetailsService {
                 token
                 )
         );
+    }
+
+    private void handleAdminRegistration(UserRequest request){
+
     }
 
     private String generateUserIdentifier(){
