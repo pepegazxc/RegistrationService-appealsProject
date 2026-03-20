@@ -3,11 +3,15 @@ package main.service;
 import lombok.extern.slf4j.Slf4j;
 import main.dto.enums.RolesEnum;
 import main.dto.request.UserRequest;
+import main.entity.AdminRequestEntity;
+import main.entity.AdminRequestStatusEntity;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
 import main.event.UserRegisteredEvent;
 import main.exception.user.RoleNotFoundException;
 import main.exception.user.UserNotFoundException;
+import main.repository.AdminRequestRepository;
+import main.repository.AdminRequestStatusRepository;
 import main.repository.RolesRepository;
 import main.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,6 +21,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -29,8 +36,10 @@ public class UserService implements UserDetailsService {
     private final RolesRepository rolesRepository;
     private final EmailVerificationService emailService;
     private final ApplicationEventPublisher publisher;
+    private final AdminRequestStatusRepository adminRequestStatusRepository;
+    private final AdminRequestRepository adminRequestRepository;
 
-    public UserService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, RolesRepository rolesRepository, EmailVerificationService emailService, ApplicationEventPublisher publisher) {
+    public UserService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, RolesRepository rolesRepository, EmailVerificationService emailService, ApplicationEventPublisher publisher, AdminRequestStatusRepository adminRequestStatusRepository, AdminRequestRepository adminRequestRepository) {
         this.userRepository = userRepository;
         this.cipher = cipher;
         this.encoder = encoder;
@@ -38,6 +47,8 @@ public class UserService implements UserDetailsService {
         this.rolesRepository = rolesRepository;
         this.emailService = emailService;
         this.publisher = publisher;
+        this.adminRequestStatusRepository = adminRequestStatusRepository;
+        this.adminRequestRepository = adminRequestRepository;
     }
 
 
@@ -57,12 +68,18 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void registration(UserRequest request){
-        if (request.getRole() == RolesEnum.admin){
-            handleAdminRegistration(request);
-        }
+        String userRole = request.getRole().toString();
 
-        RolesEntity role = findRole(request);
+        RolesEntity role = request.getRole() == RolesEnum.admin
+                            ? findRole("PENDING_ADMIN")
+                            : findRole(userRole);
+
         UsersEntity user = addNewUser(request, role);
+
+
+        if (request.getRole() == RolesEnum.admin){
+            handleAdminRegistration(user);
+        }
 
         userRepository.save(user);
         log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
@@ -76,8 +93,11 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    private void handleAdminRegistration(UserRequest request){
+    private void handleAdminRegistration(UsersEntity user){
+        AdminRequestStatusEntity status = findAdminRequestStatus("PENDING");
+        AdminRequestEntity admin = buildAdminRequest(user, status);
 
+        adminRequestRepository.save(admin);
     }
 
     private String generateUserIdentifier(){
@@ -86,6 +106,17 @@ public class UserService implements UserDetailsService {
             identifier = userIdentifier.generate();
         } while (userRepository.existsByUserIdentifier(identifier));
         return identifier;
+    }
+
+    private AdminRequestEntity buildAdminRequest(UsersEntity user, AdminRequestStatusEntity status){
+        return AdminRequestEntity.builder()
+                .user(user)
+                .status(status)
+                .token(generateToken())
+                .createdAt(LocalDateTime.now())
+                .expiresAt(LocalDateTime.now().plusDays(7))
+                .reviewedAt(null)
+                .build();
     }
     
     private UsersEntity findByCipherEmail(String cipherEmail){
@@ -110,13 +141,20 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    private RolesEntity findRole(UserRequest request){
-        return rolesRepository.findByRoleName(request.getRole().toString().trim().toUpperCase())
+    private AdminRequestStatusEntity findAdminRequestStatus(String status){
+        return adminRequestStatusRepository.findByStatus(status)
+                .orElseThrow(() -> new IllegalStateException());
+    }
+
+    private RolesEntity findRole(String role){
+        return rolesRepository.findByRoleName(role.trim().toUpperCase())
                 .orElseThrow(() -> new RoleNotFoundException());
     }
 
     private String decryptEmail(String email){
         return cipher.decrypt(email);
     }
+
+    private String generateToken() {return UUID.randomUUID().toString();}
 
 }

@@ -21,6 +21,7 @@ public class Config {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/registration","/login","/mail/confirm").permitAll()
+                        .requestMatchers("/token/refresh").hasAnyRole("USER", "ADMIN", "MAYOR")
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
