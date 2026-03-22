@@ -1,7 +1,9 @@
 package main.service;
 
 import lombok.extern.slf4j.Slf4j;
+import main.dto.enums.AdminActionEnum;
 import main.dto.enums.RolesEnum;
+import main.dto.request.AdminRequestActionRequest;
 import main.dto.request.UserRequest;
 import main.entity.AdminRequestEntity;
 import main.entity.AdminRequestStatusEntity;
@@ -94,6 +96,26 @@ public class UserService implements UserDetailsService {
         );
     }
 
+    @Transactional
+    public void handleAdminRequest(String token, AdminRequestActionRequest actionRequest){
+        String action = actionRequest.getAdminAction().toString();
+
+        AdminRequestEntity request = findAdminRequest(token);
+        AdminRequestStatusEntity newStatus = findAdminRequestStatus(action);
+
+        setNewStatusToAdminRequest(request, newStatus);
+
+        UsersEntity user = request.getUser();
+        RolesEntity newRole = actionRequest.getAdminAction() == AdminActionEnum.APPROVED
+                                ? findRole("admin")
+                                : findRole("user");
+
+        setNewStatusToUser(user, newRole);
+
+        adminRequestRepository.save(request);
+        userRepository.save(user);
+    }
+
     private void handleAdminRegistration(UsersEntity user){
         AdminRequestStatusEntity status = findAdminRequestStatus("PENDING");
         AdminRequestEntity admin = buildAdminRequest(user, status);
@@ -126,6 +148,14 @@ public class UserService implements UserDetailsService {
                 .reviewedAt(null)
                 .build();
     }
+
+    private AdminRequestEntity findAdminRequest(String token){
+        return adminRequestRepository.findByToken(token)
+                .orElseThrow(() -> {
+                    log.warn("Can't find admin request with token: {}", token);
+                    throw new IllegalStateException();
+                });
+    }
     
     private UsersEntity findByCipherEmail(String cipherEmail){
         return userRepository.findByCipherEmail(cipherEmail)
@@ -152,6 +182,14 @@ public class UserService implements UserDetailsService {
     private AdminRequestStatusEntity findAdminRequestStatus(String status){
         return adminRequestStatusRepository.findByStatus(status)
                 .orElseThrow(() -> new IllegalStateException());
+    }
+
+    private void setNewStatusToUser(UsersEntity user,RolesEntity role){
+        user.setRole(role);
+    }
+
+    private void setNewStatusToAdminRequest(AdminRequestEntity adminRequest, AdminRequestStatusEntity status){
+        adminRequest.setStatus(status);
     }
 
     private RolesEntity findRole(String role){

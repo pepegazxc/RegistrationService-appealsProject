@@ -3,8 +3,9 @@ package main.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import main.dto.enums.RolesEnum;
+import main.dto.request.AdminRequestActionRequest;
 import main.dto.response.AuthResponse;
+import main.dto.response.ConfirmAdminRequestResponse;
 import main.dto.response.EmailConfirmationResponse;
 import main.dto.response.RefreshTokenResponse;
 import main.dto.request.UserRequest;
@@ -76,6 +77,17 @@ public class UserController {
                 new EmailConfirmationResponse(
                         "Your email has been successfully confirmed. Your request has been added",
                         "You will get your token after admin confirmation"
+                )
+        );
+    }
+
+    @PatchMapping("/admin/request")
+    public ResponseEntity<ConfirmAdminRequestResponse> confirmAdminRequest(@RequestParam String token, @RequestBody AdminRequestActionRequest adminAction){
+        userService.handleAdminRequest(token, adminAction);
+
+        return ResponseEntity.ok().body(
+                new ConfirmAdminRequestResponse(
+                    "Request information has successfully changed"
                 )
         );
     }
