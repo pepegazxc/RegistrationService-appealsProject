@@ -2,6 +2,7 @@ package main.event;
 
 import lombok.Getter;
 
+@Getter
 public class UserRegisteredEvent {
 
     private final String email;
@@ -10,12 +11,5 @@ public class UserRegisteredEvent {
     public UserRegisteredEvent(String email, String token) {
         this.email = email;
         this.token = token;
-    }
-
-    public String getEmail(){
-        return email;
-    }
-    public String getToken(){
-        return token;
     }
 }

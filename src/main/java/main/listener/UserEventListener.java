@@ -1,5 +1,6 @@
 package main.listener;
 
+import main.event.AdminRequestEvent;
 import main.event.UserRegisteredEvent;
 import main.service.mail.MailService;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,18 @@ public class UserEventListener {
                 userEvent.getEmail(),
                 "Mail confirmation",
                 "Please use this link for confirm your mail: " + link
+        );
+    }
+
+    @Async
+    @EventListener
+    public void handleAdminRequestMail(AdminRequestEvent adminEvent){
+        String link = appUrl + "/admin/request/confirm?token=" + adminEvent.getToken();
+
+        mailService.sendMail(
+                adminEvent.getEmail(),
+                "Admin confirmation",
+                "Use this link confirm or reject admin: " + link
         );
     }
 }

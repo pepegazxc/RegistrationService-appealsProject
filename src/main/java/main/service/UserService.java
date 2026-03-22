@@ -7,6 +7,7 @@ import main.entity.AdminRequestEntity;
 import main.entity.AdminRequestStatusEntity;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
+import main.event.AdminRequestEvent;
 import main.event.UserRegisteredEvent;
 import main.exception.user.RoleNotFoundException;
 import main.exception.user.UserNotFoundException;
@@ -98,6 +99,13 @@ public class UserService implements UserDetailsService {
         AdminRequestEntity admin = buildAdminRequest(user, status);
 
         adminRequestRepository.save(admin);
+
+        publisher.publishEvent(
+                new AdminRequestEvent(
+                        admin.getToken(),
+                        decryptEmail(admin.getUser().getCipherEmail())
+                )
+        );
     }
 
     private String generateUserIdentifier(){
