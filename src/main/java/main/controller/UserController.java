@@ -3,10 +3,12 @@ package main.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import main.dto.enums.RolesEnum;
 import main.dto.response.AuthResponse;
 import main.dto.response.EmailConfirmationResponse;
 import main.dto.response.RefreshTokenResponse;
 import main.dto.request.UserRequest;
+import main.entity.UsersEntity;
 import main.service.AuthService;
 import main.service.EmailVerificationService;
 import main.service.UserService;
@@ -58,18 +60,23 @@ public class UserController {
 
     @GetMapping("/mail/confirm")
     public ResponseEntity<EmailConfirmationResponse> confirmMail(@RequestParam String token){
-        email.confirmUserEmail(token);
-        String jwtToken = jwt.generateJwtTokenForCurrentUser();
+        UsersEntity user = email.confirmUserEmail(token);
+
+        if (user.getRole().getRoleName().equals("USER")) {
+            String jwtToken = jwt.generateJwtTokenForCurrentUser();
+
+            return ResponseEntity.ok(
+                    new EmailConfirmationResponse(
+                            "Your email has been successfully confirmed",
+                            jwtToken
+                    )
+            );
+        }
         return ResponseEntity.ok(
                 new EmailConfirmationResponse(
-                        "Your email has been successfully confirmed",
-                        jwtToken
+                        "Your email has been successfully confirmed. Your request has been added",
+                        "You will get your token after admin confirmation"
                 )
         );
-    }
-
-    @GetMapping("")
-    public ResponseEntity confirmMailForAdmin(){
-        return null;
     }
 }

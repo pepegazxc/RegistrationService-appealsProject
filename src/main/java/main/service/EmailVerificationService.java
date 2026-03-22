@@ -33,7 +33,7 @@ public class EmailVerificationService {
     }
 
     @Transactional
-    public void confirmUserEmail(String token){
+    public UsersEntity confirmUserEmail(String token){
         EmailVerificationTokensEntity email = searchByToken(token);
         checkEmailToken(email);
 
@@ -43,6 +43,8 @@ public class EmailVerificationService {
         confirmEmail(user);
         tokenIsUsed(email);
         log.info("User {} successfully verified mail", user.getUserIdentifier());
+
+        return user;
     }
 
     private EmailVerificationTokensEntity buildEmailTokenEntity(UsersEntity user){
