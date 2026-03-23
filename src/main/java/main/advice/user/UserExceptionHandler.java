@@ -70,6 +70,13 @@ public class UserExceptionHandler {
                     ex.getMessage()
             ));
         }
+
+        if ("one_admin_request_per_user".equals(constraintName)){
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(new ExceptionResponse(
+                    "You cannot submit another request until your first one is rejected or expires",
+                    ex.getMessage()
+            ));
+        }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ExceptionResponse(
                         "An error occurred during registration. Please try to registering again.",
