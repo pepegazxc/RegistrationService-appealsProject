@@ -82,7 +82,7 @@ public class UserController {
     }
 
     @PatchMapping("/admin/request")
-    public ResponseEntity<ConfirmAdminRequestResponse> confirmAdminRequest(@RequestParam String token, @RequestBody AdminRequestActionRequest adminAction){
+    public ResponseEntity<ConfirmAdminRequestResponse> confirmAdminRequest(@RequestParam String token, @RequestBody @Valid AdminRequestActionRequest adminAction){
         userService.handleAdminRequest(token, adminAction);
 
         return ResponseEntity.ok().body(

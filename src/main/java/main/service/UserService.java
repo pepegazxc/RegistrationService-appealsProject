@@ -101,6 +101,7 @@ public class UserService implements UserDetailsService {
         String action = actionRequest.getAdminAction().toString();
 
         AdminRequestEntity request = findAdminRequest(token);
+        checkToken(request);
         AdminRequestStatusEntity newStatus = findAdminRequestStatus(action);
 
         setNewStatusToAdminRequest(request, newStatus);
@@ -128,6 +129,13 @@ public class UserService implements UserDetailsService {
                         decryptEmail(admin.getUser().getCipherEmail())
                 )
         );
+    }
+
+    private void checkToken(AdminRequestEntity request ){
+        if (request.getExpiresAt().isBefore(LocalDateTime.now())){
+            log.warn("Admin request token has expired {}", request.getUser().getUserIdentifier());
+            throw new IllegalStateException();
+        }
     }
 
     private String generateUserIdentifier(){
@@ -181,7 +189,10 @@ public class UserService implements UserDetailsService {
 
     private AdminRequestStatusEntity findAdminRequestStatus(String status){
         return adminRequestStatusRepository.findByStatus(status)
-                .orElseThrow(() -> new IllegalStateException());
+                .orElseThrow(() -> {
+                    log.warn("Can't find admin request status");
+                    throw new IllegalStateException();
+                });
     }
 
     private void setNewStatusToUser(UsersEntity user,RolesEntity role){
