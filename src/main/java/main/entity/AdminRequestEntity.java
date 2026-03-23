@@ -35,4 +35,7 @@ public class AdminRequestEntity {
 
     @Column(name = "reviewed_at")
     private LocalDateTime reviewedAt;
+
+    @Column(name = "is_used")
+    private Boolean isUsed;
 }
