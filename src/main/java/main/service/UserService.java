@@ -18,6 +18,7 @@ import main.repository.AdminRequestStatusRepository;
 import main.repository.RolesRepository;
 import main.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
