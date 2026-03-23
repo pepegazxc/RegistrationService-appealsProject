@@ -102,6 +102,7 @@ public class UserService implements UserDetailsService {
         String action = actionRequest.getAdminAction().toString();
 
         AdminRequestEntity request = findAdminRequest(token);
+        checkOnUsed(request);
         checkToken(request);
         AdminRequestStatusEntity newStatus = findAdminRequestStatus(action);
 
@@ -130,6 +131,10 @@ public class UserService implements UserDetailsService {
                         decryptEmail(admin.getUser().getCipherEmail())
                 )
         );
+    }
+
+    private void checkOnUsed(AdminRequestEntity request){
+        if (request.getIsUsed()) throw new IllegalStateException();
     }
 
     private void checkToken(AdminRequestEntity request ){
