@@ -1,0 +1,3 @@
+ALTER TABLE admin_request
+ADD COLUMN
+is_used BOOLEAN DEFAULT false NOT NULL;
