@@ -142,6 +142,7 @@ public class UserService implements UserDetailsService {
             log.warn("Admin request token has expired {}", request.getUser().getUserIdentifier());
             throw new IllegalStateException();
         }
+
     }
 
     private String generateUserIdentifier(){
@@ -207,6 +208,7 @@ public class UserService implements UserDetailsService {
 
     private void setNewStatusToAdminRequest(AdminRequestEntity adminRequest, AdminRequestStatusEntity status){
         adminRequest.setStatus(status);
+        adminRequest.setReviewedAt(LocalDateTime.now());
     }
 
     private RolesEntity findRole(String role){
