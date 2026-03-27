@@ -81,20 +81,23 @@ public class UserService implements UserDetailsService {
         UsersEntity user = addNewUser(request, role);
 
 
-        if (request.getRole() == RolesEnum.admin){
-            handleAdminRegistration(user);
-        }
-
         userRepository.save(user);
         log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
 
-        String token = emailService.generateTokenForEmail(user);
 
-        publisher.publishEvent(new UserRegisteredEvent(
-                decryptEmail(user.getCipherEmail()),
-                token
-                )
-        );
+
+        if (request.getRole() == RolesEnum.admin){
+            handleAdminRegistration(user);
+        }else{
+            String token = emailService.generateTokenForEmail(user);
+
+            publisher.publishEvent(new UserRegisteredEvent(
+                            decryptEmail(user.getCipherEmail()),
+                            token
+                    )
+            );
+        }
+
     }
 
     @Transactional
@@ -125,9 +128,11 @@ public class UserService implements UserDetailsService {
 
         adminRequestRepository.save(admin);
 
+        String token = emailService.generateTokenForEmail(user);
+
         publisher.publishEvent(
                 new AdminRequestEvent(
-                        admin.getToken(),
+                        token,
                         decryptEmail(admin.getUser().getCipherEmail())
                 )
         );
@@ -157,10 +162,11 @@ public class UserService implements UserDetailsService {
         return AdminRequestEntity.builder()
                 .user(user)
                 .status(status)
-                .token(generateToken())
+                .token(generateTokenForAdmin())
                 .createdAt(LocalDateTime.now())
                 .expiresAt(LocalDateTime.now().plusDays(7))
                 .reviewedAt(null)
+                .isUsed(false)
                 .build();
     }
 
@@ -209,6 +215,7 @@ public class UserService implements UserDetailsService {
     private void setNewStatusToAdminRequest(AdminRequestEntity adminRequest, AdminRequestStatusEntity status){
         adminRequest.setStatus(status);
         adminRequest.setReviewedAt(LocalDateTime.now());
+        adminRequest.setIsUsed(true);
     }
 
     private RolesEntity findRole(String role){
@@ -220,6 +227,6 @@ public class UserService implements UserDetailsService {
         return cipher.decrypt(email);
     }
 
-    private String generateToken() {return UUID.randomUUID().toString();}
+    private String generateTokenForAdmin() {return UUID.randomUUID().toString();}
 
 }

@@ -37,7 +37,7 @@ public class UserEventListener {
     @Async
     @EventListener
     public void handleAdminRequestMail(AdminRequestEvent adminEvent){
-        String link = appUrl + "/admin/request/confirm?token=" + adminEvent.getToken();
+        String link = appUrl + "/mail/confirm?token=" + adminEvent.getToken();
 
         mailService.sendMail(
                 adminEvent.getEmail(),
