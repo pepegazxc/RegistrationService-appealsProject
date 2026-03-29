@@ -100,27 +100,7 @@ public class UserService implements UserDetailsService {
 
     }
 
-    @Transactional
-    public void handleAdminRequest(String token, AdminRequestActionRequest actionRequest){
-        String action = actionRequest.getAdminAction().toString();
 
-        AdminRequestEntity request = findAdminRequest(token);
-        checkOnUsed(request);
-        checkToken(request);
-        AdminRequestStatusEntity newStatus = findAdminRequestStatus(action);
-
-        setNewStatusToAdminRequest(request, newStatus);
-
-        UsersEntity user = request.getUser();
-        RolesEntity newRole = actionRequest.getAdminAction() == AdminActionEnum.APPROVED
-                                ? findRole("admin")
-                                : findRole("user");
-
-        setNewStatusToUser(user, newRole);
-
-        adminRequestRepository.save(request);
-        userRepository.save(user);
-    }
 
     private void handleAdminRegistration(UsersEntity user){
         AdminRequestStatusEntity status = findAdminRequestStatus("PENDING");
@@ -138,17 +118,7 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    private void checkOnUsed(AdminRequestEntity request){
-        if (request.getIsUsed()) throw new IllegalStateException();
-    }
 
-    private void checkToken(AdminRequestEntity request ){
-        if (request.getExpiresAt().isBefore(LocalDateTime.now())){
-            log.warn("Admin request token has expired {}", request.getUser().getUserIdentifier());
-            throw new IllegalStateException();
-        }
-
-    }
 
     private String generateUserIdentifier(){
         String identifier;
@@ -170,13 +140,6 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    private AdminRequestEntity findAdminRequest(String token){
-        return adminRequestRepository.findByToken(token)
-                .orElseThrow(() -> {
-                    log.warn("Can't find admin request with token: {}", token);
-                    throw new IllegalStateException();
-                });
-    }
     
     private UsersEntity findByCipherEmail(String cipherEmail){
         return userRepository.findByCipherEmail(cipherEmail)
@@ -206,16 +169,6 @@ public class UserService implements UserDetailsService {
                     log.warn("Can't find admin request status");
                     throw new IllegalStateException();
                 });
-    }
-
-    private void setNewStatusToUser(UsersEntity user,RolesEntity role){
-        user.setRole(role);
-    }
-
-    private void setNewStatusToAdminRequest(AdminRequestEntity adminRequest, AdminRequestStatusEntity status){
-        adminRequest.setStatus(status);
-        adminRequest.setReviewedAt(LocalDateTime.now());
-        adminRequest.setIsUsed(true);
     }
 
     private RolesEntity findRole(String role){
