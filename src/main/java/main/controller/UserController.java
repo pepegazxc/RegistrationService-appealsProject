@@ -12,7 +12,7 @@ import main.dto.request.UserRequest;
 import main.entity.UsersEntity;
 import main.service.AuthService;
 import main.service.EmailVerificationService;
-import main.service.UserService;
+import main.service.RegistrationService;
 import main.service.jwt.AuthTokenService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class UserController {
 
-    private final UserService userService;
+    private final RegistrationService registrationService;
     private final AuthService auth;
     private final AuthTokenService jwt;
     private final EmailVerificationService email;
 
-    public UserController(UserService userService, AuthService auth, AuthTokenService jwt, EmailVerificationService email) {
-        this.userService = userService;
+    public UserController(RegistrationService registrationService, AuthService auth, AuthTokenService jwt, EmailVerificationService email) {
+        this.registrationService = registrationService;
         this.auth = auth;
         this.jwt = jwt;
         this.email = email;
@@ -36,7 +36,7 @@ public class UserController {
     @PostMapping("/registration")
     public ResponseEntity<AuthResponse> registration(@Valid @RequestBody UserRequest request, HttpServletRequest httpRequest){
         log.info("Registration attempt email={}", request.getEmail());
-        userService.registration(request);
+        registrationService.registration(request);
         auth.autoAuth(request.getEmail(), request.getPassword(), httpRequest);
 
         log.info("Registration success email={}", request.getEmail());
@@ -83,7 +83,7 @@ public class UserController {
 
     @PatchMapping("/admin/request")
     public ResponseEntity<ConfirmAdminRequestResponse> confirmAdminRequest(@RequestParam String token, @RequestBody @Valid AdminRequestActionRequest adminAction){
-        userService.handleAdminRequest(token, adminAction);
+        registrationService.handleAdminRequest(token, adminAction);
 
         return ResponseEntity.ok().body(
                 new ConfirmAdminRequestResponse(

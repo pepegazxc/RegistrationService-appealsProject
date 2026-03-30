@@ -1,9 +1,7 @@
 package main.service;
 
 import lombok.extern.slf4j.Slf4j;
-import main.dto.enums.AdminActionEnum;
 import main.dto.enums.RolesEnum;
-import main.dto.request.AdminRequestActionRequest;
 import main.dto.request.UserRequest;
 import main.entity.AdminRequestEntity;
 import main.entity.AdminRequestStatusEntity;
@@ -18,7 +16,6 @@ import main.repository.AdminRequestStatusRepository;
 import main.repository.RolesRepository;
 import main.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,7 +28,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
-public class UserService implements UserDetailsService {
+public class RegistrationService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final CipherService cipher;
@@ -43,7 +40,7 @@ public class UserService implements UserDetailsService {
     private final AdminRequestStatusRepository adminRequestStatusRepository;
     private final AdminRequestRepository adminRequestRepository;
 
-    public UserService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, RolesRepository rolesRepository, EmailVerificationService emailService, ApplicationEventPublisher publisher, AdminRequestStatusRepository adminRequestStatusRepository, AdminRequestRepository adminRequestRepository) {
+    public RegistrationService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, RolesRepository rolesRepository, EmailVerificationService emailService, ApplicationEventPublisher publisher, AdminRequestStatusRepository adminRequestStatusRepository, AdminRequestRepository adminRequestRepository) {
         this.userRepository = userRepository;
         this.cipher = cipher;
         this.encoder = encoder;
@@ -99,8 +96,6 @@ public class UserService implements UserDetailsService {
         }
 
     }
-
-
 
     private void handleAdminRegistration(UsersEntity user){
         AdminRequestStatusEntity status = findAdminRequestStatus("PENDING");
