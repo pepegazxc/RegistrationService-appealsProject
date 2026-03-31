@@ -34,22 +34,22 @@ public class RegistrationService implements UserDetailsService {
     private final CipherService cipher;
     private final PasswordEncoder encoder;
     private final UserIdentifierService userIdentifier;
-    private final RolesRepository rolesRepository;
     private final EmailVerificationService emailService;
     private final ApplicationEventPublisher publisher;
     private final AdminRequestStatusRepository adminRequestStatusRepository;
     private final AdminRequestRepository adminRequestRepository;
+    private final RoleService roleService;
 
-    public RegistrationService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, RolesRepository rolesRepository, EmailVerificationService emailService, ApplicationEventPublisher publisher, AdminRequestStatusRepository adminRequestStatusRepository, AdminRequestRepository adminRequestRepository) {
+    public RegistrationService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, EmailVerificationService emailService, ApplicationEventPublisher publisher, AdminRequestStatusRepository adminRequestStatusRepository, AdminRequestRepository adminRequestRepository, RoleService roleService) {
         this.userRepository = userRepository;
         this.cipher = cipher;
         this.encoder = encoder;
         this.userIdentifier = userIdentifier;
-        this.rolesRepository = rolesRepository;
         this.emailService = emailService;
         this.publisher = publisher;
         this.adminRequestStatusRepository = adminRequestStatusRepository;
         this.adminRequestRepository = adminRequestRepository;
+        this.roleService = roleService;
     }
 
 
@@ -72,8 +72,8 @@ public class RegistrationService implements UserDetailsService {
         String userRole = request.getRole().toString();
 
         RolesEntity role = request.getRole() == RolesEnum.admin
-                            ? findRole("PENDING_ADMIN")
-                            : findRole(userRole);
+                            ? roleService.findRole("PENDING_ADMIN")
+                            : roleService.findRole(userRole);
 
         UsersEntity user = addNewUser(request, role);
 
@@ -164,11 +164,6 @@ public class RegistrationService implements UserDetailsService {
                     log.warn("Can't find admin request status");
                     throw new IllegalStateException();
                 });
-    }
-
-    private RolesEntity findRole(String role){
-        return rolesRepository.findByRoleName(role.trim().toUpperCase())
-                .orElseThrow(() -> new RoleNotFoundException());
     }
 
     private String decryptEmail(String email){
