@@ -9,6 +9,7 @@ import main.entity.RolesEntity;
 import main.entity.UsersEntity;
 import main.repository.AdminRequestRepository;
 import main.repository.AdminRequestStatusRepository;
+import main.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +20,13 @@ import java.time.LocalDateTime;
 public class AdminRequestService {
 
     private final AdminRequestRepository adminRequestRepository;
+    private final UserRepository userRepository;
+    private final RoleService roleService;
 
-    public AdminRequestService(AdminRequestRepository adminRequestRepository) {
+    public AdminRequestService(AdminRequestRepository adminRequestRepository, UserRepository userRepository, RoleService roleService) {
         this.adminRequestRepository = adminRequestRepository;
+        this.userRepository = userRepository;
+        this.roleService = roleService;
     }
 
     @Transactional
@@ -37,8 +42,8 @@ public class AdminRequestService {
 
         UsersEntity user = request.getUser();
         RolesEntity newRole = actionRequest.getAdminAction() == AdminActionEnum.APPROVED
-                ? findRole("admin")
-                : findRole("user");
+                ? roleService.findRole("admin")
+                : roleService.findRole("user");
 
         setNewStatusToUser(user, newRole);
 
