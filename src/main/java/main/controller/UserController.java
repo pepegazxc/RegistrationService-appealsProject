@@ -10,9 +10,7 @@ import main.dto.response.EmailConfirmationResponse;
 import main.dto.response.RefreshTokenResponse;
 import main.dto.request.UserRequest;
 import main.entity.UsersEntity;
-import main.service.AuthService;
-import main.service.EmailVerificationService;
-import main.service.RegistrationService;
+import main.service.*;
 import main.service.jwt.AuthTokenService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +20,14 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final RegistrationService registrationService;
+    private final AdminRequestService adminRequestService;
     private final AuthService auth;
     private final AuthTokenService jwt;
     private final EmailVerificationService email;
 
-    public UserController(RegistrationService registrationService, AuthService auth, AuthTokenService jwt, EmailVerificationService email) {
+    public UserController(RegistrationService registrationService, AdminRequestService adminRequestService, AuthService auth, AuthTokenService jwt, EmailVerificationService email) {
         this.registrationService = registrationService;
+        this.adminRequestService = adminRequestService;
         this.auth = auth;
         this.jwt = jwt;
         this.email = email;
@@ -83,7 +83,7 @@ public class UserController {
 
     @PatchMapping("/admin/request")
     public ResponseEntity<ConfirmAdminRequestResponse> confirmAdminRequest(@RequestParam String token, @RequestBody @Valid AdminRequestActionRequest adminAction){
-        registrationService.handleAdminRequest(token, adminAction);
+        adminRequestService.handleAdminRequest(token, adminAction);
 
         return ResponseEntity.ok().body(
                 new ConfirmAdminRequestResponse(
