@@ -76,32 +76,12 @@ public class RegistrationService implements UserDetailsService {
         userRepository.save(user);
         log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
 
-        if (request.getRole() == RolesEnum.admin){
-            handleAdminRegistration(user);
-        }else{
-            String token = emailService.generateTokenForEmail(user);
-
-            publisher.publishEvent(new RegistrationEvent(
-                            decryptEmail(user.getCipherEmail()),
-                            token
-                    )
-            );
-        }
-
-    }
-
-    private void handleAdminRegistration(UsersEntity user){
-        AdminRequestStatusEntity status = adminRequestStatusRepository.findAdminRequestStatus("PENDING");
-        AdminRequestEntity admin = buildAdminRequest(user, status);
-
-        adminRequestRepository.save(admin);
 
         String token = emailService.generateTokenForEmail(user);
 
-        publisher.publishEvent(
-                new RegistrationEvent(
-                        token,
-                        decryptEmail(admin.getUser().getCipherEmail())
+        publisher.publishEvent(new RegistrationEvent(
+                decryptEmail(user.getCipherEmail()),
+                token
                 )
         );
     }
@@ -112,18 +92,6 @@ public class RegistrationService implements UserDetailsService {
             identifier = userIdentifier.generate();
         } while (userRepository.existsByUserIdentifier(identifier));
         return identifier;
-    }
-
-    private AdminRequestEntity buildAdminRequest(UsersEntity user, AdminRequestStatusEntity status){
-        return AdminRequestEntity.builder()
-                .user(user)
-                .status(status)
-                .token(generateTokenForAdmin())
-                .createdAt(LocalDateTime.now())
-                .expiresAt(LocalDateTime.now().plusDays(7))
-                .reviewedAt(null)
-                .isUsed(false)
-                .build();
     }
 
     
@@ -152,7 +120,5 @@ public class RegistrationService implements UserDetailsService {
     private String decryptEmail(String email){
         return cipher.decrypt(email);
     }
-
-    private String generateTokenForAdmin() {return UUID.randomUUID().toString();}
 
 }

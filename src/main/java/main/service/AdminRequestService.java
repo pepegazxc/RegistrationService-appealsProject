@@ -7,13 +7,18 @@ import main.entity.AdminRequestEntity;
 import main.entity.AdminRequestStatusEntity;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
+import main.event.AdminRequestEvent;
+import main.event.RegistrationEvent;
 import main.repository.AdminRequestRepository;
 import main.repository.AdminRequestStatusRepository;
 import main.repository.UserRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.crypto.Cipher;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -21,14 +26,20 @@ public class AdminRequestService {
 
     private final AdminRequestRepository adminRequestRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher publisher;
     private final RoleService roleService;
     private final AdminRequestStatusService adminRequestStatusService;
+    private final EmailVerificationService emailService;
+    private final CipherService cipher;
 
-    public AdminRequestService(AdminRequestRepository adminRequestRepository, UserRepository userRepository, RoleService roleService, AdminRequestStatusService adminRequestStatusService) {
+    public AdminRequestService(AdminRequestRepository adminRequestRepository, UserRepository userRepository, ApplicationEventPublisher publisher, RoleService roleService, AdminRequestStatusService adminRequestStatusService, EmailVerificationService emailService, CipherService cipher) {
         this.adminRequestRepository = adminRequestRepository;
         this.userRepository = userRepository;
+        this.publisher = publisher;
         this.roleService = roleService;
         this.adminRequestStatusService = adminRequestStatusService;
+        this.emailService = emailService;
+        this.cipher = cipher;
     }
 
     @Transactional
@@ -52,6 +63,36 @@ public class AdminRequestService {
         adminRequestRepository.save(request);
         userRepository.save(user);
     }
+
+    @Transactional
+    public void addAdminRequest(UsersEntity user){
+        AdminRequestStatusEntity status = adminRequestStatusService.findAdminRequestStatus("PENDING");
+        AdminRequestEntity admin = buildAdminRequest(user, status);
+
+        adminRequestRepository.save(admin);
+
+        String token = emailService.generateTokenForEmail(user);
+
+        publisher.publishEvent(
+                new AdminRequestEvent(
+                        token,
+                        decryptEmail(admin.getUser().getCipherEmail())
+                )
+        );
+    }
+
+    private AdminRequestEntity buildAdminRequest(UsersEntity user, AdminRequestStatusEntity status){
+        return AdminRequestEntity.builder()
+                .user(user)
+                .status(status)
+                .token(generateTokenForAdmin())
+                .createdAt(LocalDateTime.now())
+                .expiresAt(LocalDateTime.now().plusDays(7))
+                .reviewedAt(null)
+                .isUsed(false)
+                .build();
+    }
+
 
     private void checkOnUsed(AdminRequestEntity request){
         if (request.getIsUsed()) throw new IllegalStateException();
@@ -83,6 +124,13 @@ public class AdminRequestService {
         adminRequest.setReviewedAt(LocalDateTime.now());
         adminRequest.setIsUsed(true);
     }
+
+
+    private String decryptEmail(String email){
+        return cipher.decrypt(email);
+    }
+
+    private String generateTokenForAdmin() {return UUID.randomUUID().toString();}
 
 
 }

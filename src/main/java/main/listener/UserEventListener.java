@@ -1,7 +1,7 @@
 package main.listener;
 
 import main.event.AdminRequestEvent;
-import main.event.UserRegisteredEvent;
+import main.event.RegistrationEvent;
 import main.service.mail.MailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
@@ -24,7 +24,7 @@ public class UserEventListener {
 
     @Async
     @EventListener
-    public void handleMail(UserRegisteredEvent userEvent){
+    public void handleMail(RegistrationEvent userEvent){
         String link = appUrl + "/mail/confirm?token=" + userEvent.getToken();
 
         mailService.sendMail(
