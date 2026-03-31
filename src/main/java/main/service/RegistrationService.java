@@ -103,7 +103,7 @@ public class RegistrationService implements UserDetailsService {
         String token = emailService.generateTokenForEmail(user);
 
         publisher.publishEvent(
-                new AdminRequestEvent(
+                new UserRegisteredEvent(
                         token,
                         decryptEmail(admin.getUser().getCipherEmail())
                 )
