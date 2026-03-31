@@ -15,7 +15,7 @@ public class AdminRequestStatusService {
         this.adminRequestStatusRepository = adminRequestStatusRepository;
     }
 
-    private AdminRequestStatusEntity findAdminRequestStatus(String status){
+    public AdminRequestStatusEntity findAdminRequestStatus(String status){
         return adminRequestStatusRepository.findByStatus(status)
                 .orElseThrow(() -> {
                     log.warn("Can't find admin request status");

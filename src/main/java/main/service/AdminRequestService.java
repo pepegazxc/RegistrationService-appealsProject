@@ -22,11 +22,13 @@ public class AdminRequestService {
     private final AdminRequestRepository adminRequestRepository;
     private final UserRepository userRepository;
     private final RoleService roleService;
+    private final AdminRequestStatusService adminRequestStatusService;
 
-    public AdminRequestService(AdminRequestRepository adminRequestRepository, UserRepository userRepository, RoleService roleService) {
+    public AdminRequestService(AdminRequestRepository adminRequestRepository, UserRepository userRepository, RoleService roleService, AdminRequestStatusService adminRequestStatusService) {
         this.adminRequestRepository = adminRequestRepository;
         this.userRepository = userRepository;
         this.roleService = roleService;
+        this.adminRequestStatusService = adminRequestStatusService;
     }
 
     @Transactional
@@ -36,7 +38,7 @@ public class AdminRequestService {
         AdminRequestEntity request = findAdminRequest(token);
         checkOnUsed(request);
         checkToken(request);
-        AdminRequestStatusEntity newStatus = findAdminRequestStatus(action);
+        AdminRequestStatusEntity newStatus = adminRequestStatusService.findAdminRequestStatus(action);
 
         setNewStatusToAdminRequest(request, newStatus);
 

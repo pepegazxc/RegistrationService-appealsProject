@@ -36,11 +36,11 @@ public class RegistrationService implements UserDetailsService {
     private final UserIdentifierService userIdentifier;
     private final EmailVerificationService emailService;
     private final ApplicationEventPublisher publisher;
-    private final AdminRequestStatusRepository adminRequestStatusRepository;
+    private final AdminRequestStatusService adminRequestStatusRepository;
     private final AdminRequestRepository adminRequestRepository;
     private final RoleService roleService;
 
-    public RegistrationService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, EmailVerificationService emailService, ApplicationEventPublisher publisher, AdminRequestStatusRepository adminRequestStatusRepository, AdminRequestRepository adminRequestRepository, RoleService roleService) {
+    public RegistrationService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, EmailVerificationService emailService, ApplicationEventPublisher publisher, AdminRequestStatusService adminRequestStatusRepository, AdminRequestRepository adminRequestRepository, RoleService roleService) {
         this.userRepository = userRepository;
         this.cipher = cipher;
         this.encoder = encoder;
@@ -77,11 +77,8 @@ public class RegistrationService implements UserDetailsService {
 
         UsersEntity user = addNewUser(request, role);
 
-
         userRepository.save(user);
         log.info("New user has been registered. Unique identifier {}", user.getUserIdentifier());
-
-
 
         if (request.getRole() == RolesEnum.admin){
             handleAdminRegistration(user);
@@ -98,7 +95,7 @@ public class RegistrationService implements UserDetailsService {
     }
 
     private void handleAdminRegistration(UsersEntity user){
-        AdminRequestStatusEntity status = findAdminRequestStatus("PENDING");
+        AdminRequestStatusEntity status = adminRequestStatusRepository.findAdminRequestStatus("PENDING");
         AdminRequestEntity admin = buildAdminRequest(user, status);
 
         adminRequestRepository.save(admin);
@@ -112,8 +109,6 @@ public class RegistrationService implements UserDetailsService {
                 )
         );
     }
-
-
 
     private String generateUserIdentifier(){
         String identifier;
@@ -156,14 +151,6 @@ public class RegistrationService implements UserDetailsService {
                 .isEmailVerified(false)
                 .isActive(true)
                 .build();
-    }
-
-    private AdminRequestStatusEntity findAdminRequestStatus(String status){
-        return adminRequestStatusRepository.findByStatus(status)
-                .orElseThrow(() -> {
-                    log.warn("Can't find admin request status");
-                    throw new IllegalStateException();
-                });
     }
 
     private String decryptEmail(String email){
