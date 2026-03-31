@@ -7,13 +7,9 @@ import main.entity.AdminRequestEntity;
 import main.entity.AdminRequestStatusEntity;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
-import main.event.AdminRequestEvent;
-import main.event.UserRegisteredEvent;
-import main.exception.user.RoleNotFoundException;
+import main.event.RegistrationEvent;
 import main.exception.user.UserNotFoundException;
 import main.repository.AdminRequestRepository;
-import main.repository.AdminRequestStatusRepository;
-import main.repository.RolesRepository;
 import main.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -85,7 +81,7 @@ public class RegistrationService implements UserDetailsService {
         }else{
             String token = emailService.generateTokenForEmail(user);
 
-            publisher.publishEvent(new UserRegisteredEvent(
+            publisher.publishEvent(new RegistrationEvent(
                             decryptEmail(user.getCipherEmail()),
                             token
                     )
@@ -103,7 +99,7 @@ public class RegistrationService implements UserDetailsService {
         String token = emailService.generateTokenForEmail(user);
 
         publisher.publishEvent(
-                new UserRegisteredEvent(
+                new RegistrationEvent(
                         token,
                         decryptEmail(admin.getUser().getCipherEmail())
                 )
