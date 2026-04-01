@@ -45,4 +45,7 @@ token:
   key: ${JWT_KEY}
 
 app:
-  url: http://localhost:8081
+  url: ${APP_URL}
+
+mail:
+  main: ${MAIN_MAIL}

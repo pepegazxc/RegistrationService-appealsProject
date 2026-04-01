@@ -15,6 +15,8 @@ public class UserEventListener {
 
     @Value("${app.url}")
     private String appUrl;
+    @Value("${mail.main}")
+    private String mainMail;
 
     private final MailService mailService;
 
@@ -40,7 +42,7 @@ public class UserEventListener {
         String link = appUrl + "/mail/confirm?token=" + adminEvent.getToken();
 
         mailService.sendMail(
-                adminEvent.getEmail(),
+                mainMail,
                 "Admin confirmation",
                 "Use this link confirm or reject admin: " + link
         );

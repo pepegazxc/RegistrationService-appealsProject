@@ -19,7 +19,6 @@ public class UserController {
     private final AdminRequestService adminRequestService;
     private final AuthService auth;
     private final AuthTokenService jwt;
-    private final EmailVerificationService email;
     private final EmailConfirmationResultService emailConfirmationResultService;
 
     public UserController(RegistrationService registrationService, AdminRequestService adminRequestService, AuthService auth, AuthTokenService jwt, EmailVerificationService email, EmailConfirmationResultService emailConfirmationResultService) {
@@ -27,7 +26,6 @@ public class UserController {
         this.adminRequestService = adminRequestService;
         this.auth = auth;
         this.jwt = jwt;
-        this.email = email;
         this.emailConfirmationResultService = emailConfirmationResultService;
     }
 
