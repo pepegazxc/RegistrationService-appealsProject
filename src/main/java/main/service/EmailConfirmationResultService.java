@@ -7,13 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class EmailConfirmationResult {
+public class EmailConfirmationResultService {
 
     private final AuthTokenService jwt;
     private final EmailVerificationService email;
     private final AdminRequestService adminRequestService;
 
-    public EmailConfirmationResult(AuthTokenService jwt, EmailVerificationService email, AdminRequestService adminRequestService) {
+    public EmailConfirmationResultService(AuthTokenService jwt, EmailVerificationService email, AdminRequestService adminRequestService) {
         this.jwt = jwt;
         this.email = email;
         this.adminRequestService = adminRequestService;

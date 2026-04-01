@@ -4,12 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import main.dto.request.AdminRequestActionRequest;
-import main.dto.response.AuthResponse;
-import main.dto.response.ConfirmAdminRequestResponse;
-import main.dto.response.EmailConfirmationResponse;
-import main.dto.response.RefreshTokenResponse;
+import main.dto.response.*;
 import main.dto.request.UserRequest;
-import main.entity.UsersEntity;
 import main.service.*;
 import main.service.jwt.AuthTokenService;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +20,15 @@ public class UserController {
     private final AuthService auth;
     private final AuthTokenService jwt;
     private final EmailVerificationService email;
+    private final EmailConfirmationResultService emailConfirmationResultService;
 
-    public UserController(RegistrationService registrationService, AdminRequestService adminRequestService, AuthService auth, AuthTokenService jwt, EmailVerificationService email) {
+    public UserController(RegistrationService registrationService, AdminRequestService adminRequestService, AuthService auth, AuthTokenService jwt, EmailVerificationService email, EmailConfirmationResultService emailConfirmationResultService) {
         this.registrationService = registrationService;
         this.adminRequestService = adminRequestService;
         this.auth = auth;
         this.jwt = jwt;
         this.email = email;
+        this.emailConfirmationResultService = emailConfirmationResultService;
     }
 
     @PostMapping("/registration")
@@ -61,22 +59,12 @@ public class UserController {
 
     @GetMapping("/mail/confirm")
     public ResponseEntity<EmailConfirmationResponse> confirmMail(@RequestParam String token){
-        UsersEntity user = email.confirmUserEmail(token);
+        EmailConfirmResultResponse result = emailConfirmationResultService.confirmationResult(token);
 
-        if (user.getRole().getRoleName().equals("USER")) {
-            String jwtToken = jwt.generateJwtTokenForCurrentUser();
-
-            return ResponseEntity.ok(
-                    new EmailConfirmationResponse(
-                            "Your email has been successfully confirmed",
-                            jwtToken
-                    )
-            );
-        }
         return ResponseEntity.ok(
                 new EmailConfirmationResponse(
-                        "Your email has been successfully confirmed. Your request has been added",
-                        "You will get your token after admin confirmation"
+                        result.getMessage(),
+                        result.getToken()
                 )
         );
     }
