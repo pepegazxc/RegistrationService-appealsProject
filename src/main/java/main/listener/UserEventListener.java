@@ -6,10 +6,11 @@ import main.event.RegistrationEvent;
 import main.service.AdminRequestResponseResultService;
 import main.service.mail.MailService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 
 @Component
@@ -29,7 +30,7 @@ public class UserEventListener {
     }
 
     @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleMail(RegistrationEvent userEvent){
         String link = appUrl + "/mail/confirm?token=" + userEvent.getToken();
 
@@ -41,7 +42,7 @@ public class UserEventListener {
     }
 
     @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleAdminRequestMail(AdminRequestEvent adminEvent){
         String link = appUrl + "/mail/confirm?token=" + adminEvent.getToken();
 
@@ -53,7 +54,7 @@ public class UserEventListener {
     }
 
     @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleAdminRequestResponseMail(AdminRequestResponseEvent adminResponseEvent){
         mailService.sendMail(
                 adminResponseEvent.getEmail(),
