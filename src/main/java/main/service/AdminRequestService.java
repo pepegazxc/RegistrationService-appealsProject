@@ -8,6 +8,7 @@ import main.entity.AdminRequestStatusEntity;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
 import main.event.AdminRequestEvent;
+import main.event.AdminRequestResponseEvent;
 import main.event.RegistrationEvent;
 import main.repository.AdminRequestRepository;
 import main.repository.AdminRequestStatusRepository;
@@ -60,8 +61,12 @@ public class AdminRequestService {
 
         setNewStatusToUser(user, newRole);
 
-        adminRequestRepository.save(request);
-        userRepository.save(user);
+        publisher.publishEvent(
+                new AdminRequestResponseEvent(
+                        decryptEmail(user.getCipherEmail()),
+                        actionRequest.getAdminAction()
+                )
+        );
     }
 
     @Transactional

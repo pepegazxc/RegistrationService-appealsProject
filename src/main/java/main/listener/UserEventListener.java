@@ -3,6 +3,7 @@ package main.listener;
 import main.event.AdminRequestEvent;
 import main.event.AdminRequestResponseEvent;
 import main.event.RegistrationEvent;
+import main.service.AdminRequestResponseResultService;
 import main.service.mail.MailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
@@ -20,9 +21,11 @@ public class UserEventListener {
     private String mainMail;
 
     private final MailService mailService;
+    private final AdminRequestResponseResultService resultService;
 
-    public UserEventListener(MailService mailService) {
+    public UserEventListener(MailService mailService, AdminRequestResponseResultService resultService) {
         this.mailService = mailService;
+        this.resultService = resultService;
     }
 
     @Async
@@ -55,7 +58,7 @@ public class UserEventListener {
         mailService.sendMail(
                 adminResponseEvent.getEmail(),
                 "Admin request results",
-                "text"
+                resultService.handleAdminRequestResult(adminResponseEvent.getAction())
         );
     }
 }
