@@ -76,7 +76,7 @@ public class AdminRequestService {
 
         adminRequestRepository.save(admin);
 
-        String token = emailService.generateTokenForEmail(user);
+        String token = admin.getToken();
 
         publisher.publishEvent(
                 new AdminRequestEvent(

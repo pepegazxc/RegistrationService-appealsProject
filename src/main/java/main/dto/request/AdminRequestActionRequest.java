@@ -8,6 +8,5 @@ import main.dto.enums.AdminActionEnum;
 @Data
 public class AdminRequestActionRequest {
     @NotNull
-    @NotBlank
     AdminActionEnum adminAction;
 }
