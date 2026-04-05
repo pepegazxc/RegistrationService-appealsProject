@@ -17,5 +17,5 @@ public interface AdminRequestRepository extends JpaRepository<AdminRequestEntity
             "WHERE status_id = (SELECT id FROM admin_request_status WHERE status = 'PENDING') " +
             "AND expires_at < now();"
             ,nativeQuery = true)
-    int expireOldRequest();
+    int expireOldRequests();
 }
