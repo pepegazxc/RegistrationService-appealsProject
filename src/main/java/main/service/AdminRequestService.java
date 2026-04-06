@@ -10,6 +10,7 @@ import main.entity.UsersEntity;
 import main.event.AdminRequestEvent;
 import main.event.AdminRequestResponseEvent;
 import main.event.RegistrationEvent;
+import main.exception.request.AdminRequestIsExpiredException;
 import main.repository.AdminRequestRepository;
 import main.repository.AdminRequestStatusRepository;
 import main.repository.UserRepository;
@@ -26,20 +27,16 @@ import java.util.UUID;
 public class AdminRequestService {
 
     private final AdminRequestRepository adminRequestRepository;
-    private final UserRepository userRepository;
     private final ApplicationEventPublisher publisher;
     private final RoleService roleService;
     private final AdminRequestStatusService adminRequestStatusService;
-    private final EmailVerificationService emailService;
     private final CipherService cipher;
 
-    public AdminRequestService(AdminRequestRepository adminRequestRepository, UserRepository userRepository, ApplicationEventPublisher publisher, RoleService roleService, AdminRequestStatusService adminRequestStatusService, EmailVerificationService emailService, CipherService cipher) {
+    public AdminRequestService(AdminRequestRepository adminRequestRepository, ApplicationEventPublisher publisher, RoleService roleService, AdminRequestStatusService adminRequestStatusService,CipherService cipher) {
         this.adminRequestRepository = adminRequestRepository;
-        this.userRepository = userRepository;
         this.publisher = publisher;
         this.roleService = roleService;
         this.adminRequestStatusService = adminRequestStatusService;
-        this.emailService = emailService;
         this.cipher = cipher;
     }
 
@@ -106,7 +103,7 @@ public class AdminRequestService {
     private void checkToken(AdminRequestEntity request ){
         if (request.getExpiresAt().isBefore(LocalDateTime.now())){
             log.warn("Admin request token has expired {}", request.getUser().getUserIdentifier());
-            throw new IllegalStateException();
+            throw new AdminRequestIsExpiredException();
         }
 
     }
