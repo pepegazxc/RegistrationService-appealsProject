@@ -1,4 +1,4 @@
-package main.shedule;
+package main.schedule;
 
 import lombok.extern.slf4j.Slf4j;
 import main.repository.AdminRequestRepository;
