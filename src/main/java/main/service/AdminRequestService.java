@@ -9,16 +9,13 @@ import main.entity.RolesEntity;
 import main.entity.UsersEntity;
 import main.event.AdminRequestEvent;
 import main.event.AdminRequestResponseEvent;
-import main.event.RegistrationEvent;
 import main.exception.request.AdminRequestIsExpiredException;
+import main.exception.request.AdminRequestNotFoundException;
 import main.repository.AdminRequestRepository;
-import main.repository.AdminRequestStatusRepository;
-import main.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.crypto.Cipher;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -112,7 +109,7 @@ public class AdminRequestService {
         return adminRequestRepository.findByToken(token)
                 .orElseThrow(() -> {
                     log.warn("Can't find admin request with token: {}", token);
-                    throw new IllegalStateException();
+                    throw new AdminRequestNotFoundException();
                 });
     }
 
