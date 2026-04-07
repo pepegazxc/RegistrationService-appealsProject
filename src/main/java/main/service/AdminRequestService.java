@@ -9,7 +9,7 @@ import main.entity.RolesEntity;
 import main.entity.UsersEntity;
 import main.event.AdminRequestEvent;
 import main.event.AdminRequestResponseEvent;
-import main.exception.request.AdminRequestIsExpiredException;
+import main.exception.request.AdminRequestExpiredException;
 import main.exception.request.AdminRequestNotFoundException;
 import main.exception.request.AdminRequestTokenIsUsedException;
 import main.repository.AdminRequestRepository;
@@ -101,7 +101,7 @@ public class AdminRequestService {
     private void checkToken(AdminRequestEntity request ){
         if (request.getExpiresAt().isBefore(LocalDateTime.now())){
             log.warn("Admin request token has expired {}", request.getUser().getUserIdentifier());
-            throw new AdminRequestIsExpiredException();
+            throw new AdminRequestExpiredException();
         }
 
     }
