@@ -1,6 +1,7 @@
 package main.service;
 
 import main.dto.enums.AdminActionEnum;
+import main.exception.request.AdminRequestActionNotFoundException;
 import main.exception.request.AdminRequestStatusNotFoundException;
 import main.service.jwt.AuthTokenService;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,6 @@ public class AdminRequestResponseResultService {
             return "Your request has been rejected. You also can try again";
         }
 
-        throw new AdminRequestStatusNotFoundException();
+        throw new AdminRequestActionNotFoundException();
     }
 }

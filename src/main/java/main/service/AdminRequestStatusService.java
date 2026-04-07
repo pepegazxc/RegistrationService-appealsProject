@@ -2,6 +2,7 @@ package main.service;
 
 import lombok.extern.slf4j.Slf4j;
 import main.entity.AdminRequestStatusEntity;
+import main.exception.request.AdminRequestStatusNotFoundException;
 import main.repository.AdminRequestStatusRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public class AdminRequestStatusService {
         return adminRequestStatusRepository.findByStatus(status)
                 .orElseThrow(() -> {
                     log.warn("Can't find admin request status");
-                    throw new IllegalStateException();
+                    throw new AdminRequestStatusNotFoundException();
                 });
     }
 }

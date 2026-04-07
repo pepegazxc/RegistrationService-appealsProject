@@ -11,6 +11,7 @@ import main.event.AdminRequestEvent;
 import main.event.AdminRequestResponseEvent;
 import main.exception.request.AdminRequestIsExpiredException;
 import main.exception.request.AdminRequestNotFoundException;
+import main.exception.request.AdminRequestTokenIsUsedException;
 import main.repository.AdminRequestRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -94,7 +95,7 @@ public class AdminRequestService {
 
 
     private void checkOnUsed(AdminRequestEntity request){
-        if (request.getIsUsed()) throw new IllegalStateException();
+        if (request.getIsUsed()) throw new AdminRequestTokenIsUsedException();
     }
 
     private void checkToken(AdminRequestEntity request ){
