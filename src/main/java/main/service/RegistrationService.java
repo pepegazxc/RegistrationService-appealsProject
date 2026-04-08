@@ -32,19 +32,15 @@ public class RegistrationService implements UserDetailsService {
     private final UserIdentifierService userIdentifier;
     private final EmailVerificationService emailService;
     private final ApplicationEventPublisher publisher;
-    private final AdminRequestStatusService adminRequestStatusRepository;
-    private final AdminRequestRepository adminRequestRepository;
     private final RoleService roleService;
 
-    public RegistrationService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, EmailVerificationService emailService, ApplicationEventPublisher publisher, AdminRequestStatusService adminRequestStatusRepository, AdminRequestRepository adminRequestRepository, RoleService roleService) {
+    public RegistrationService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, EmailVerificationService emailService, ApplicationEventPublisher publisher, RoleService roleService) {
         this.userRepository = userRepository;
         this.cipher = cipher;
         this.encoder = encoder;
         this.userIdentifier = userIdentifier;
         this.emailService = emailService;
         this.publisher = publisher;
-        this.adminRequestStatusRepository = adminRequestStatusRepository;
-        this.adminRequestRepository = adminRequestRepository;
         this.roleService = roleService;
     }
 
@@ -67,9 +63,11 @@ public class RegistrationService implements UserDetailsService {
     public void registration(UserRequest request){
         String userRole = request.getRole().toString();
 
-        RolesEntity role = request.getRole() == RolesEnum.admin
-                            ? roleService.findRole("PENDING_ADMIN")
-                            : roleService.findRole(userRole);
+        RolesEntity role = switch (userRole){
+            case "admin" -> roleService.findRole("PENDING_ADMIN");
+            case "mayor" -> roleService.findRole("PENDING_MAYOR");
+            default -> roleService.findRole(userRole);
+        };
 
         UsersEntity user = addNewUser(request, role);
 
