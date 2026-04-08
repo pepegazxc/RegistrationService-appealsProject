@@ -22,6 +22,13 @@ public class EmailConfirmResultResponse {
     public static EmailConfirmResultResponse adminEmailConfirmed() {
         return new EmailConfirmResultResponse(
                 "Your email has been successfully confirmed. Your request has been added",
+                "You will get your token after owner confirmation"
+        );
+    }
+
+    public static EmailConfirmResultResponse mayorEmailConfirmed(){
+        return new EmailConfirmResultResponse(
+                "Your email has been successfully confirmed. Your request has been added",
                 "You will get your token after admin confirmation"
         );
     }
