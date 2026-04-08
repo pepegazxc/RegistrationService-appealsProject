@@ -19,7 +19,7 @@ public class AdminRequestStatusService {
     public AdminRequestStatusEntity findAdminRequestStatus(String status){
         return adminRequestStatusRepository.findByStatus(status)
                 .orElseThrow(() -> {
-                    log.warn("Can't find admin request status");
+                    log.warn("Can't find admin request status {}", status);
                     throw new AdminRequestStatusNotFoundException();
                 });
     }

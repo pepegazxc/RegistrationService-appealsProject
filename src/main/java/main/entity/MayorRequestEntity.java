@@ -24,7 +24,7 @@ public class MayorRequestEntity {
 
     @ManyToOne
     @JoinColumn(name = "status_id")
-    private MayorStatusRequestEntity status;
+    private MayorRequestStatusEntity status;
 
     private String token;
 
