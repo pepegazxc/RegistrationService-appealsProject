@@ -12,25 +12,40 @@ public class EmailConfirmationResultService {
     private final AuthTokenService jwt;
     private final EmailVerificationService email;
     private final AdminRequestService adminRequestService;
+    private final MayorRequestService mayorRequestService;
 
-    public EmailConfirmationResultService(AuthTokenService jwt, EmailVerificationService email, AdminRequestService adminRequestService) {
+    public EmailConfirmationResultService(AuthTokenService jwt, EmailVerificationService email, AdminRequestService adminRequestService, MayorRequestService mayorRequestService) {
         this.jwt = jwt;
         this.email = email;
         this.adminRequestService = adminRequestService;
+        this.mayorRequestService = mayorRequestService;
     }
 
     @Transactional
     public EmailConfirmResultResponse confirmationResult(String token) {
         UsersEntity user = email.confirmUserEmail(token);
 
-        if (user.getRole().getRoleName().equals("USER")) {
-            String jwtToken = jwt.generateJwtTokenForCurrentUser();
 
-            return EmailConfirmResultResponse.userEmailConfirmed(jwtToken);
+        switch (user.getRole().getRoleName()){
+            case "USER" -> {
+                String jwtToken = jwt.generateJwtTokenForCurrentUser();
+
+                return EmailConfirmResultResponse.userEmailConfirmed(jwtToken);
+            }
+
+            case "PENDING_ADMIN" -> {
+                adminRequestService.addAdminRequest(user);
+
+                return EmailConfirmResultResponse.adminEmailConfirmed();
+            }
+
+            case "PENDING_MAYOR" -> {
+                mayorRequestService.addMayorRequest(user);
+
+                return EmailConfirmResultResponse.mayorEmailConfirmed();
+            }
+
+            default -> throw new  IllegalArgumentException();
         }
-
-        adminRequestService.addAdminRequest(user);
-
-        return EmailConfirmResultResponse.adminEmailConfirmed();
     }
 }
