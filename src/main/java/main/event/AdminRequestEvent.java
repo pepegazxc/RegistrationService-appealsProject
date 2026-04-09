@@ -6,10 +6,8 @@ import lombok.Getter;
 public class AdminRequestEvent {
 
     private final String token;
-    private final String email;
 
-    public AdminRequestEvent(String token, String email) {
+    public AdminRequestEvent(String token) {
         this.token = token;
-        this.email = email;
     }
 }

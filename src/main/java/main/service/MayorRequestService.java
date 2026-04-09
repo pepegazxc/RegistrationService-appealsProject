@@ -3,6 +3,7 @@ package main.service;
 import main.entity.MayorRequestEntity;
 import main.entity.MayorRequestStatusEntity;
 import main.entity.UsersEntity;
+import main.event.MayorRequestEvent;
 import main.repository.MayorRequestRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -18,12 +19,14 @@ public class MayorRequestService {
     private final MayorRequestRepository mayorRequestRepository;
     private final CipherService cipher;
     private final ApplicationEventPublisher publisher;
+    private final AdminsEmailsService adminsEmailsService;
 
-    public MayorRequestService(MayorRequestStatusService requestStatusService, MayorRequestRepository mayorRequestRepository, CipherService cipher, ApplicationEventPublisher publisher) {
+    public MayorRequestService(MayorRequestStatusService requestStatusService, MayorRequestRepository mayorRequestRepository, CipherService cipher, ApplicationEventPublisher publisher, AdminsEmailsService adminsEmailsService) {
         this.requestStatusService = requestStatusService;
         this.mayorRequestRepository = mayorRequestRepository;
         this.cipher = cipher;
         this.publisher = publisher;
+        this.adminsEmailsService = adminsEmailsService;
     }
 
     @Transactional
@@ -35,8 +38,7 @@ public class MayorRequestService {
 
         String mayorToken = mayorRequest.getToken();
 
-        Object obj = null;
-        publisher.publishEvent(obj);
+        adminsEmailsService.sendMailToAdmins(mayorToken);
     }
 
     private MayorRequestEntity buildMayorRequest(UsersEntity user, MayorRequestStatusEntity status){

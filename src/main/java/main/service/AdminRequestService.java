@@ -75,8 +75,7 @@ public class AdminRequestService {
 
         publisher.publishEvent(
                 new AdminRequestEvent(
-                        token,
-                        decryptEmail(admin.getUser().getCipherEmail())
+                        token
                 )
         );
     }
