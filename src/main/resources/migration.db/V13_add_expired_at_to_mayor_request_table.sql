@@ -1,0 +1,3 @@
+ALTER TABLE mayor_request
+ADD COLUMN
+expired_at TIMESTAMPTZ NOT NULL DEFAULT now() + INTERVAL '7 days'
