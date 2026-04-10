@@ -1,8 +1,8 @@
 package main.service;
 
 import lombok.extern.slf4j.Slf4j;
-import main.dto.enums.AdminActionEnum;
-import main.dto.request.AdminRequestActionRequest;
+import main.dto.enums.RequestsActionEnum;
+import main.dto.request.RequestsActionRequest;
 import main.entity.AdminRequestEntity;
 import main.entity.AdminRequestStatusEntity;
 import main.entity.RolesEntity;
@@ -39,8 +39,8 @@ public class AdminRequestService {
     }
 
     @Transactional
-    public void handleAdminRequest(String token, AdminRequestActionRequest actionRequest){
-        String action = actionRequest.getAdminAction().toString();
+    public void handleAdminRequest(String token, RequestsActionRequest actionRequest){
+        String action = actionRequest.getAction().toString();
 
         AdminRequestEntity request = findAdminRequest(token);
         checkOnUsed(request);
@@ -50,7 +50,7 @@ public class AdminRequestService {
         setNewStatusToAdminRequest(request, newStatus);
 
         UsersEntity user = request.getUser();
-        RolesEntity newRole = actionRequest.getAdminAction() == AdminActionEnum.APPROVED
+        RolesEntity newRole = actionRequest.getAction() == RequestsActionEnum.APPROVED
                 ? roleService.findRole("admin")
                 : roleService.findRole("user");
 
@@ -59,7 +59,7 @@ public class AdminRequestService {
         publisher.publishEvent(
                 new AdminRequestResponseEvent(
                         decryptEmail(user.getCipherEmail()),
-                        actionRequest.getAdminAction()
+                        actionRequest.getAction()
                 )
         );
     }

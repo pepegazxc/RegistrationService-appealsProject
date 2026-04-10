@@ -1,5 +1,5 @@
 package main.dto.enums;
 
-public enum AdminActionEnum {
+public enum RequestsActionEnum {
     APPROVED, REJECTED
 }

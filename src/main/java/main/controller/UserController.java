@@ -3,7 +3,7 @@ package main.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import main.dto.request.AdminRequestActionRequest;
+import main.dto.request.RequestsActionRequest;
 import main.dto.response.*;
 import main.dto.request.UserRequest;
 import main.service.*;
@@ -68,12 +68,22 @@ public class UserController {
     }
 
     @PatchMapping("/admin/request")
-    public ResponseEntity<ConfirmAdminRequestResponse> confirmAdminRequest(@RequestParam String token, @RequestBody @Valid AdminRequestActionRequest adminAction){
+    public ResponseEntity<ConfirmRequestsResponse> confirmAdminRequest(@RequestParam String token, @RequestBody @Valid RequestsActionRequest adminAction){
         adminRequestService.handleAdminRequest(token, adminAction);
 
         return ResponseEntity.ok().body(
-                new ConfirmAdminRequestResponse(
+                new ConfirmRequestsResponse(
                     "Request information has successfully changed"
+                )
+        );
+    }
+
+    @PatchMapping("/mayor/request")
+    public ResponseEntity<ConfirmRequestsResponse> confirmMayorRequest(@RequestParam String token, @RequestBody @Valid RequestsActionRequest mayorAction){
+
+        return ResponseEntity.ok().body(
+                new ConfirmRequestsResponse(
+                        "Request information has successfully changed"
                 )
         );
     }
