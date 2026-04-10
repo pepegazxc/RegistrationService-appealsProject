@@ -2,6 +2,7 @@ package main.schedule;
 
 import lombok.extern.slf4j.Slf4j;
 import main.repository.AdminRequestRepository;
+import main.repository.MayorRequestRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,15 +12,24 @@ import org.springframework.transaction.annotation.Transactional;
 public class CheckExpiredRequests {
 
     private final AdminRequestRepository adminRequestRepository;
+    private final MayorRequestRepository mayorRequestRepository;
 
-    public CheckExpiredRequests(AdminRequestRepository adminRequestRepository) {
+    public CheckExpiredRequests(AdminRequestRepository adminRequestRepository, MayorRequestRepository mayorRequestRepository) {
         this.adminRequestRepository = adminRequestRepository;
+        this.mayorRequestRepository = mayorRequestRepository;
     }
 
     @Transactional
     @Scheduled(cron = "0 0 0 * * *")
     public void checkExpiredAdminRequests(){
         int request = adminRequestRepository.expireOldRequests();
+        log.info("Expired admin requests {}", request);
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * *")
+    public void checkExpiredMayorRequests(){
+        int request = mayorRequestRepository.expiredOldRequests();
         log.info("Expired admin requests {}", request);
     }
 }
