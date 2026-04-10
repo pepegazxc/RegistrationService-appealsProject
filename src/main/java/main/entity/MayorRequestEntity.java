@@ -36,4 +36,7 @@ public class MayorRequestEntity {
 
     @Column(name = "is_used")
     private Boolean isUsed;
+
+    @Column(name = "expired_at")
+    private LocalDateTime expiredAt;
 }

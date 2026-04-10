@@ -74,6 +74,7 @@ public class MayorRequestService {
                 .createdAt(LocalDateTime.now())
                 .reviewed_at(null)
                 .isUsed(false)
+                .expiredAt(LocalDateTime.now().plusDays(7))
                 .build();
     }
 
