@@ -20,13 +20,15 @@ public class UserController {
     private final AuthService auth;
     private final AuthTokenService jwt;
     private final EmailConfirmationResultService emailConfirmationResultService;
+    private final MayorRequestService mayorRequestService;
 
-    public UserController(RegistrationService registrationService, AdminRequestService adminRequestService, AuthService auth, AuthTokenService jwt, EmailVerificationService email, EmailConfirmationResultService emailConfirmationResultService) {
+    public UserController(RegistrationService registrationService, AdminRequestService adminRequestService, AuthService auth, AuthTokenService jwt, EmailVerificationService email, EmailConfirmationResultService emailConfirmationResultService, MayorRequestService mayorRequestService) {
         this.registrationService = registrationService;
         this.adminRequestService = adminRequestService;
         this.auth = auth;
         this.jwt = jwt;
         this.emailConfirmationResultService = emailConfirmationResultService;
+        this.mayorRequestService = mayorRequestService;
     }
 
     @PostMapping("/registration")
@@ -80,6 +82,7 @@ public class UserController {
 
     @PatchMapping("/mayor/request")
     public ResponseEntity<ConfirmRequestsResponse> confirmMayorRequest(@RequestParam String token, @RequestBody @Valid RequestsActionRequest mayorAction){
+        mayorRequestService.handleMayorRequest(token, mayorAction);
 
         return ResponseEntity.ok().body(
                 new ConfirmRequestsResponse(

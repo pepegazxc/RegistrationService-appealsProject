@@ -1,8 +1,7 @@
 package main.service;
 
-import main.dto.enums.AdminActionEnum;
+import main.dto.enums.RequestsActionEnum;
 import main.exception.request.AdminRequestActionNotFoundException;
-import main.exception.request.AdminRequestStatusNotFoundException;
 import main.service.jwt.AuthTokenService;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +14,12 @@ public class AdminRequestResponseResultService {
         this.jwtService = jwtService;
     }
 
-    public String handleAdminRequestResult(AdminActionEnum action){
+    public String handleAdminRequestResult(RequestsActionEnum action){
 
-        if (action == AdminActionEnum.APPROVED){
+        if (action == RequestsActionEnum.APPROVED){
             String jwt = jwtService.generateJwtTokenForCurrentUser();
             return  "Your request has been approved! Your jwt: " + jwt;
-        }else if (action == AdminActionEnum.REJECTED){
+        }else if (action == RequestsActionEnum.REJECTED){
             return "Your request has been rejected. You also can try again";
         }
 
