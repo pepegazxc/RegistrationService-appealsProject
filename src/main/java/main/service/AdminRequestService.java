@@ -8,7 +8,7 @@ import main.entity.AdminRequestStatusEntity;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
 import main.event.AdminRequestEvent;
-import main.event.AdminRequestResponseEvent;
+import main.event.RequestResponseEvent;
 import main.exception.request.AdminRequestExpiredException;
 import main.exception.request.AdminRequestNotFoundException;
 import main.exception.request.AdminRequestTokenIsUsedException;
@@ -57,7 +57,7 @@ public class AdminRequestService {
         setNewStatusToUser(user, newRole);
 
         publisher.publishEvent(
-                new AdminRequestResponseEvent(
+                new RequestResponseEvent(
                         decryptEmail(user.getCipherEmail()),
                         actionRequest.getAction()
                 )

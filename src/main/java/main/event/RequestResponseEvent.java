@@ -4,12 +4,12 @@ import lombok.Getter;
 import main.dto.enums.RequestsActionEnum;
 
 @Getter
-public class AdminRequestResponseEvent {
+public class RequestResponseEvent {
 
     private final String email;
     private final RequestsActionEnum action;
 
-    public AdminRequestResponseEvent(String email, RequestsActionEnum action) {
+    public RequestResponseEvent(String email, RequestsActionEnum action) {
         this.email = email;
         this.action = action;
     }

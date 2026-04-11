@@ -1,10 +1,11 @@
 package main.listener;
 
 import main.event.AdminRequestEvent;
-import main.event.AdminRequestResponseEvent;
 import main.event.MayorRequestEvent;
 import main.event.RegistrationEvent;
+import main.event.RequestResponseEvent;
 import main.service.AdminRequestResponseResultService;
+import main.service.MayorRequestResponseResultService;
 import main.service.mail.MailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
@@ -23,11 +24,13 @@ public class UserEventListener {
     private String mainMail;
 
     private final MailService mailService;
-    private final AdminRequestResponseResultService resultService;
+    private final AdminRequestResponseResultService adminResultService;
+    private final MayorRequestResponseResultService mayorRequestResultService;
 
-    public UserEventListener(MailService mailService, AdminRequestResponseResultService resultService) {
+    public UserEventListener(MailService mailService, AdminRequestResponseResultService adminResultService, MayorRequestResponseResultService mayorRequestResultService) {
         this.mailService = mailService;
-        this.resultService = resultService;
+        this.adminResultService = adminResultService;
+        this.mayorRequestResultService = mayorRequestResultService;
     }
 
     @Async
@@ -67,11 +70,20 @@ public class UserEventListener {
     }
 
     @EventListener
-    public void handleAdminRequestResponseMail(AdminRequestResponseEvent adminResponseEvent){
+    public void handleAdminRequestResponseMail(RequestResponseEvent adminResponseEvent){
         mailService.sendMail(
                 adminResponseEvent.getEmail(),
                 "Admin request results",
-                resultService.handleAdminRequestResult(adminResponseEvent.getAction())
+                adminResultService.handleAdminRequestResult(adminResponseEvent.getAction())
+        );
+    }
+
+    @EventListener
+    public void handleMayorRequestResponseMail(RequestResponseEvent mayorResponseEvent){
+        mailService.sendMail(
+                mayorResponseEvent.getEmail(),
+                "Mayor request results",
+                mayorRequestResultService.handleMayorRequestResult(mayorResponseEvent.getAction())
         );
     }
 }
