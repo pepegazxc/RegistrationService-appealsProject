@@ -1,6 +1,7 @@
 package main.service;
 
 import main.event.MayorRequestEvent;
+import main.exception.email.AdminsEmailsNotFoundException;
 import main.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,9 @@ public class AdminsEmailsService {
     }
 
     public void sendMailToAdmins(String mayorToken){
-        for (String e : getAdminsEmails()) {
-            String email = e;
+        List<String> emails = getAdminsEmails();
 
+        for(String email : emails) {
             publisher.publishEvent(
                     new MayorRequestEvent(
                             email,
@@ -34,9 +35,12 @@ public class AdminsEmailsService {
     }
 
     private List<String> getAdminsEmails(){
-        List<String> emails = userRepository.selectAdminsEmails().
-                stream().map(cipher::decrypt).toList();
+        List<String> emails = userRepository.selectAdminsEmails();
 
-        return emails;
+        if (emails == null || emails.isEmpty()) throw new AdminsEmailsNotFoundException();
+
+        return emails.stream().map(cipher::decrypt).toList();
     }
+
+
 }

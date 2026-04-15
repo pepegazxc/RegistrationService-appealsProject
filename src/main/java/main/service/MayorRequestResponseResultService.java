@@ -1,7 +1,7 @@
 package main.service;
 
 import main.dto.enums.RequestsActionEnum;
-import main.exception.request.AdminRequestActionNotFoundException;
+import main.exception.request.MayorRequestActionNotFoundException;
 import main.service.jwt.AuthTokenService;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +23,6 @@ public class MayorRequestResponseResultService {
             return "Your request has been rejected. You also can try again";
         }
 
-        throw new IllegalStateException();
+        throw new MayorRequestActionNotFoundException();
     }
 }
