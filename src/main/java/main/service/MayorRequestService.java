@@ -6,6 +6,7 @@ import main.entity.MayorRequestEntity;
 import main.entity.MayorRequestStatusEntity;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
+import main.exception.request.MayorRequestStatusNotFoundException;
 import main.repository.MayorRequestRepository;
 import main.repository.MayorRequestStatusRepository;
 import org.springframework.context.ApplicationEventPublisher;
@@ -20,17 +21,13 @@ public class MayorRequestService {
 
     private final MayorRequestStatusService requestStatusService;
     private final MayorRequestRepository mayorRequestRepository;
-    private final CipherService cipher;
-    private final ApplicationEventPublisher publisher;
     private final AdminsEmailsService adminsEmailsService;
     private final RoleService roleService;
     private final MayorRequestStatusRepository mayorRequestStatusRepository;
 
-    public MayorRequestService(MayorRequestStatusService requestStatusService, MayorRequestRepository mayorRequestRepository, CipherService cipher, ApplicationEventPublisher publisher, AdminsEmailsService adminsEmailsService,RoleService roleService, MayorRequestStatusRepository mayorRequestStatusRepository) {
+    public MayorRequestService(MayorRequestStatusService requestStatusService, MayorRequestRepository mayorRequestRepository, AdminsEmailsService adminsEmailsService,RoleService roleService, MayorRequestStatusRepository mayorRequestStatusRepository) {
         this.requestStatusService = requestStatusService;
         this.mayorRequestRepository = mayorRequestRepository;
-        this.cipher = cipher;
-        this.publisher = publisher;
         this.adminsEmailsService = adminsEmailsService;
         this.roleService = roleService;
         this.mayorRequestStatusRepository = mayorRequestStatusRepository;
@@ -88,7 +85,7 @@ public class MayorRequestService {
 
     private MayorRequestStatusEntity findMayorRequestStatus(String action){
         return mayorRequestStatusRepository.findByStatusName(action)
-                .orElseThrow(() -> new IllegalStateException());
+                .orElseThrow(() -> new MayorRequestStatusNotFoundException());
     }
 
     private MayorRequestEntity findMayorRequest(String token){
@@ -98,9 +95,5 @@ public class MayorRequestService {
 
     private String generateTokenForMayorRequest(){
         return UUID.randomUUID().toString();
-    }
-
-    private String decryptEmail(String email){
-        return cipher.decrypt(email);
     }
 }
