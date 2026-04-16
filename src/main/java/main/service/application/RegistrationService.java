@@ -1,16 +1,15 @@
-package main.service;
+package main.service.application;
 
 import lombok.extern.slf4j.Slf4j;
-import main.dto.enums.RolesEnum;
 import main.dto.request.UserRequest;
-import main.entity.AdminRequestEntity;
-import main.entity.AdminRequestStatusEntity;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
 import main.event.RegistrationEvent;
 import main.exception.user.UserNotFoundException;
-import main.repository.AdminRequestRepository;
 import main.repository.UserRepository;
+import main.service.CipherService;
+import main.service.RoleService;
+import main.service.UserIdentifierService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,9 +17,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 @Slf4j

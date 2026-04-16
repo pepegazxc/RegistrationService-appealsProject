@@ -1,4 +1,4 @@
-package main.service;
+package main.service.application;
 
 import lombok.extern.slf4j.Slf4j;
 import main.dto.enums.RequestsActionEnum;
@@ -13,6 +13,9 @@ import main.exception.request.AdminRequestExpiredException;
 import main.exception.request.AdminRequestNotFoundException;
 import main.exception.request.AdminRequestTokenIsUsedException;
 import main.repository.AdminRequestRepository;
+import main.service.AdminRequestStatusService;
+import main.service.CipherService;
+import main.service.RoleService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
