@@ -6,7 +6,7 @@ import main.event.RegistrationEvent;
 import main.event.RequestResponseEvent;
 import main.service.AdminRequestResponseResultService;
 import main.service.MayorRequestResponseResultService;
-import main.service.mail.MailService;
+import main.service.infrastructure.mail.MailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
