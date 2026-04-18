@@ -4,8 +4,7 @@ import main.event.AdminRequestEvent;
 import main.event.MayorRequestEvent;
 import main.event.RegistrationEvent;
 import main.event.RequestResponseEvent;
-import main.service.application.AdminRequestResponseResultService;
-import main.service.application.MayorRequestResponseResultService;
+import main.service.application.RequestResponseResultService;
 import main.service.infrastructure.mail.MailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
@@ -24,13 +23,11 @@ public class UserEventListener {
     private String mainMail;
 
     private final MailService mailService;
-    private final AdminRequestResponseResultService adminResultService;
-    private final MayorRequestResponseResultService mayorRequestResultService;
+    private final RequestResponseResultService resultService;
 
-    public UserEventListener(MailService mailService, AdminRequestResponseResultService adminResultService, MayorRequestResponseResultService mayorRequestResultService) {
+    public UserEventListener(MailService mailService, RequestResponseResultService resultService) {
         this.mailService = mailService;
-        this.adminResultService = adminResultService;
-        this.mayorRequestResultService = mayorRequestResultService;
+        this.resultService = resultService;
     }
 
     @Async
@@ -74,7 +71,7 @@ public class UserEventListener {
         mailService.sendMail(
                 adminResponseEvent.getEmail(),
                 "Admin request results",
-                adminResultService.handleAdminRequestResult(adminResponseEvent.getAction())
+                resultService.handleRequestResult(adminResponseEvent.getAction())
         );
     }
 
@@ -83,7 +80,7 @@ public class UserEventListener {
         mailService.sendMail(
                 mayorResponseEvent.getEmail(),
                 "Mayor request results",
-                mayorRequestResultService.handleMayorRequestResult(mayorResponseEvent.getAction())
+                resultService.handleRequestResult(mayorResponseEvent.getAction())
         );
     }
 }

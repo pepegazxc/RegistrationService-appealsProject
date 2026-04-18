@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class AdminRequestExceptionHandler {
 
-    @ExceptionHandler(AdminRequestActionNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleAdminRequestActionException(AdminRequestActionNotFoundException ex){
+    @ExceptionHandler(RequestActionNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleAdminRequestActionException(RequestActionNotFoundException ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 new ExceptionResponse(
-                        "Wrong action to admin request. Choose between REJECTED and APPROVED",
+                        "Wrong action to request. Choose between REJECTED and APPROVED",
                         ex.getMessage()
                 )
         );

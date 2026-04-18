@@ -1,20 +1,20 @@
 package main.service.application;
 
 import main.dto.enums.RequestsActionEnum;
-import main.exception.request.AdminRequestActionNotFoundException;
+import main.exception.request.RequestActionNotFoundException;
 import main.service.infrastructure.jwt.AuthTokenService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AdminRequestResponseResultService {
+public class RequestResponseResultService {
 
     private final AuthTokenService jwtService;
 
-    public AdminRequestResponseResultService(AuthTokenService jwtService) {
+    public RequestResponseResultService(AuthTokenService jwtService) {
         this.jwtService = jwtService;
     }
 
-    public String handleAdminRequestResult(RequestsActionEnum action){
+    public String handleRequestResult(RequestsActionEnum action){
 
         if (action == RequestsActionEnum.APPROVED){
             String jwt = jwtService.generateJwtTokenForCurrentUser();
@@ -23,6 +23,6 @@ public class AdminRequestResponseResultService {
             return "Your request has been rejected. You also can try again";
         }
 
-        throw new AdminRequestActionNotFoundException();
+        throw new RequestActionNotFoundException();
     }
 }
