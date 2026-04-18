@@ -59,5 +59,25 @@ public class RequestExceptionHandler {
                 )
         );
     }
+
+    @ExceptionHandler(MayorRequestNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleMayorRequestNotFound(MayorRequestNotFoundException ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ExceptionResponse(
+                        "Mayor request not found",
+                        ex.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(MayorRequestStatusNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleMayorRequestStatusNotFound(MayorRequestStatusNotFoundException ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ExceptionResponse(
+                        "Mayor request status not found",
+                        ex.getMessage()
+                )
+        );
+    }
 }
 
