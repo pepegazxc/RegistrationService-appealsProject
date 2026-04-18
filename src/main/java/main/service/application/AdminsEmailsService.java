@@ -1,8 +1,9 @@
-package main.service;
+package main.service.application;
 
 import main.event.MayorRequestEvent;
 import main.exception.email.AdminsEmailsNotFoundException;
 import main.repository.UserRepository;
+import main.service.infrastructure.CipherService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 

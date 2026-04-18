@@ -6,12 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import main.dto.request.RequestsActionRequest;
 import main.dto.response.*;
 import main.dto.request.UserRequest;
-import main.service.*;
-import main.service.application.AdminRequestService;
-import main.service.application.EmailVerificationService;
-import main.service.application.MayorRequestService;
-import main.service.application.RegistrationService;
-import main.service.jwt.AuthTokenService;
+import main.service.application.*;
+import main.service.infrastructure.jwt.AuthTokenService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

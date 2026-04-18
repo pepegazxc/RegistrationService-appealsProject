@@ -9,9 +9,6 @@ import main.entity.UsersEntity;
 import main.exception.request.MayorRequestStatusNotFoundException;
 import main.repository.MayorRequestRepository;
 import main.repository.MayorRequestStatusRepository;
-import main.service.AdminsEmailsService;
-import main.service.MayorRequestStatusService;
-import main.service.RoleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

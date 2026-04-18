@@ -1,8 +1,8 @@
-package main.service;
+package main.service.application;
 
 import main.dto.enums.RequestsActionEnum;
 import main.exception.request.MayorRequestActionNotFoundException;
-import main.service.jwt.AuthTokenService;
+import main.service.infrastructure.jwt.AuthTokenService;
 import org.springframework.stereotype.Service;
 
 @Service
