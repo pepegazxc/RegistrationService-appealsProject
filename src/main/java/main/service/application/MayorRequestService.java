@@ -1,12 +1,16 @@
 package main.service.application;
 
+import lombok.extern.slf4j.Slf4j;
 import main.dto.enums.RequestsActionEnum;
 import main.dto.request.RequestsActionRequest;
 import main.entity.MayorRequestEntity;
 import main.entity.MayorRequestStatusEntity;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
+import main.exception.request.MayorRequestNotFoundException;
 import main.exception.request.MayorRequestStatusNotFoundException;
+import main.exception.request.RequestExpiredException;
+import main.exception.request.RequestIsUsedException;
 import main.repository.MayorRequestRepository;
 import main.repository.MayorRequestStatusRepository;
 import org.springframework.stereotype.Service;
@@ -16,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class MayorRequestService {
 
     private final MayorRequestStatusService requestStatusService;
@@ -49,6 +54,7 @@ public class MayorRequestService {
         String action = actionRequest.getAction().toString();
 
         MayorRequestEntity mayorRequest = findMayorRequest(token);
+        checkMayorRequestToken(mayorRequest);
         UsersEntity user = mayorRequest.getUser();
         MayorRequestStatusEntity mayorRequestStatus = findMayorRequestStatus(action);
 
@@ -74,6 +80,14 @@ public class MayorRequestService {
                 .build();
     }
 
+    private void checkMayorRequestToken(MayorRequestEntity request){
+        if (request.getExpiredAt().isBefore(LocalDateTime.now())){
+            log.warn("Mayor request has expired, {}", request.getUser().getUserIdentifier());
+            throw new RequestExpiredException();
+        }
+        if (request.getIsUsed()) throw new RequestIsUsedException();
+    }
+
     private void setNewStatusToMayorRequest(MayorRequestEntity request, MayorRequestStatusEntity status){
         request.setStatus(status);
         request.setReviewed_at(LocalDateTime.now());
@@ -89,7 +103,7 @@ public class MayorRequestService {
 
     private MayorRequestEntity findMayorRequest(String token){
         return mayorRequestRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalStateException());
+                .orElseThrow(() -> new MayorRequestNotFoundException());
     }
 
     private String generateTokenForMayorRequest(){

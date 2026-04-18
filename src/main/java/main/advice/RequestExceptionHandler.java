@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class AdminRequestExceptionHandler {
+public class RequestExceptionHandler {
 
     @ExceptionHandler(RequestActionNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleAdminRequestActionException(RequestActionNotFoundException ex){
@@ -20,8 +20,8 @@ public class AdminRequestExceptionHandler {
         );
     }
 
-    @ExceptionHandler(AdminRequestExpiredException.class)
-    public ResponseEntity<ExceptionResponse> handleAdminRequestExpired(AdminRequestExpiredException ex){
+    @ExceptionHandler(RequestExpiredException.class)
+    public ResponseEntity<ExceptionResponse> handleAdminRequestExpired(RequestExpiredException ex){
         return ResponseEntity.status(HttpStatus.GONE).body(
                 new ExceptionResponse(
                         "Admin request has been expired",
@@ -50,8 +50,8 @@ public class AdminRequestExceptionHandler {
         );
     }
 
-    @ExceptionHandler(AdminRequestTokenIsUsedException.class)
-    public ResponseEntity<ExceptionResponse> handleUsedAdminRequestToken (AdminRequestTokenIsUsedException ex){
+    @ExceptionHandler(RequestIsUsedException.class)
+    public ResponseEntity<ExceptionResponse> handleUsedAdminRequestToken (RequestIsUsedException ex){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 new ExceptionResponse(
                         "Admin request token is already used",
