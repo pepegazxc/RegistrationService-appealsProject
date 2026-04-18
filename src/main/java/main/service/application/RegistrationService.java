@@ -8,7 +8,7 @@ import main.event.RegistrationEvent;
 import main.exception.user.UserNotFoundException;
 import main.repository.UserRepository;
 import main.service.infrastructure.CipherService;
-import main.service.UserIdentifierService;
+import main.service.support.UserIdentifierService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
