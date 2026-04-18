@@ -1,4 +1,4 @@
-package main.service.mail;
+package main.service.infrastructure.mail;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class MailService implements MailSender{
+public class MailService implements MailSender {
 
     private final JavaMailSender mailSender;
 

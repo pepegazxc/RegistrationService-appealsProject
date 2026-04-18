@@ -1,4 +1,4 @@
-package main.service.jwt;
+package main.service.infrastructure.jwt;
 
 import lombok.extern.slf4j.Slf4j;
 import main.exception.security.EmptySecurityContextException;

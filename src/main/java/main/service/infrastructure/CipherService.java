@@ -1,4 +1,4 @@
-package main.service;
+package main.service.infrastructure;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;

@@ -1,4 +1,4 @@
-package main.service;
+package main.service.application;
 
 import lombok.extern.slf4j.Slf4j;
 import main.entity.AdminRequestStatusEntity;

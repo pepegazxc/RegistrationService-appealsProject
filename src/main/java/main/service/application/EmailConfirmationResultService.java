@@ -1,8 +1,8 @@
-package main.service;
+package main.service.application;
 
 import main.dto.response.EmailConfirmResultResponse;
 import main.entity.UsersEntity;
-import main.service.jwt.AuthTokenService;
+import main.service.infrastructure.jwt.AuthTokenService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

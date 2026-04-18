@@ -1,4 +1,4 @@
-package main.service;
+package main.service.application;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

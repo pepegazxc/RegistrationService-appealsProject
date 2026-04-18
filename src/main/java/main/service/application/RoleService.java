@@ -1,4 +1,4 @@
-package main.service;
+package main.service.application;
 
 import main.entity.RolesEntity;
 import main.exception.user.RoleNotFoundException;

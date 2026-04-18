@@ -1,4 +1,4 @@
-package main.advice.request;
+package main.advice;
 
 import main.dto.response.ExceptionResponse;
 import main.exception.request.*;
@@ -8,20 +8,20 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class AdminRequestExceptionHandler {
+public class RequestExceptionHandler {
 
-    @ExceptionHandler(AdminRequestActionNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleAdminRequestActionException(AdminRequestActionNotFoundException ex){
+    @ExceptionHandler(RequestActionNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleAdminRequestActionException(RequestActionNotFoundException ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 new ExceptionResponse(
-                        "Wrong action to admin request. Choose between REJECTED and APPROVED",
+                        "Wrong action to request. Choose between REJECTED and APPROVED",
                         ex.getMessage()
                 )
         );
     }
 
-    @ExceptionHandler(AdminRequestExpiredException.class)
-    public ResponseEntity<ExceptionResponse> handleAdminRequestExpired(AdminRequestExpiredException ex){
+    @ExceptionHandler(RequestExpiredException.class)
+    public ResponseEntity<ExceptionResponse> handleAdminRequestExpired(RequestExpiredException ex){
         return ResponseEntity.status(HttpStatus.GONE).body(
                 new ExceptionResponse(
                         "Admin request has been expired",
@@ -50,11 +50,31 @@ public class AdminRequestExceptionHandler {
         );
     }
 
-    @ExceptionHandler(AdminRequestTokenIsUsedException.class)
-    public ResponseEntity<ExceptionResponse> handleUsedAdminRequestToken (AdminRequestTokenIsUsedException ex){
+    @ExceptionHandler(RequestIsUsedException.class)
+    public ResponseEntity<ExceptionResponse> handleUsedAdminRequestToken (RequestIsUsedException ex){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 new ExceptionResponse(
                         "Admin request token is already used",
+                        ex.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(MayorRequestNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleMayorRequestNotFound(MayorRequestNotFoundException ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ExceptionResponse(
+                        "Mayor request not found",
+                        ex.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(MayorRequestStatusNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleMayorRequestStatusNotFound(MayorRequestStatusNotFoundException ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ExceptionResponse(
+                        "Mayor request status not found",
                         ex.getMessage()
                 )
         );
