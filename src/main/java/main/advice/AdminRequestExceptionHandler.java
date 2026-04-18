@@ -1,4 +1,4 @@
-package main.advice.request;
+package main.advice;
 
 import main.dto.response.ExceptionResponse;
 import main.exception.request.*;

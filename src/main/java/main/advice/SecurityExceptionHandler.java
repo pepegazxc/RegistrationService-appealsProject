@@ -1,4 +1,4 @@
-package main.advice.security;
+package main.advice;
 
 import main.dto.response.ExceptionResponse;
 import main.exception.security.EmptySecurityContextException;

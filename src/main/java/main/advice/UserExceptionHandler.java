@@ -1,4 +1,4 @@
-package main.advice.user;
+package main.advice;
 
 import main.dto.response.ExceptionResponse;
 import main.exception.user.RoleNotFoundException;

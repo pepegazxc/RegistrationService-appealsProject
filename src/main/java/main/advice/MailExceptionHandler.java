@@ -1,4 +1,4 @@
-package main.advice.mail;
+package main.advice;
 
 import main.dto.response.ExceptionResponse;
 import main.exception.email.*;
