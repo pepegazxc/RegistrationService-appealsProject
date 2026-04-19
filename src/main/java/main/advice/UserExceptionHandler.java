@@ -1,5 +1,6 @@
 package main.advice;
 
+import main.advice.factory.ExceptionResponseFactory;
 import main.dto.response.ExceptionResponse;
 import main.exception.user.RoleNotFoundException;
 import main.exception.user.UserNotFoundException;
@@ -12,12 +13,24 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class UserExceptionHandler {
 
+    private final ExceptionResponseFactory responseFactory;
+
+    public UserExceptionHandler(ExceptionResponseFactory responseFactory) {
+        this.responseFactory = responseFactory;
+    }
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleUserNotFoundException(UserNotFoundException ex){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResponse(
+
+        return responseFactory.buildResponse(
+                HttpStatus.NOT_FOUND,
                 "Invalid email or password.",
                 ex.getMessage()
-        ));
+        );
+//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionResponse(
+//                "Invalid email or password.",
+//                ex.getMessage()
+//        ));
     }
 
     @ExceptionHandler(RoleNotFoundException.class)
