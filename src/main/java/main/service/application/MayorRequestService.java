@@ -97,7 +97,7 @@ public class MayorRequestService {
     private void setNewRole(UsersEntity user, RolesEntity role) { user.setRole(role); }
 
     private MayorRequestStatusEntity findMayorRequestStatus(String action){
-        return mayorRequestStatusRepository.findByStatusName(action)
+        return mayorRequestStatusRepository.findByStatus(action)
                 .orElseThrow(() -> new MayorRequestStatusNotFoundException());
     }
 

@@ -16,7 +16,7 @@ public class MayorRequestStatusService {
     }
 
     public MayorRequestStatusEntity findMayorRequestStatus(String statusName){
-        return statusRepository.findByStatusName(statusName)
+        return statusRepository.findByStatus(statusName)
                 .orElseThrow(() -> {
                     log.warn("Can't find admin request status {}", statusName);
                     throw new IllegalStateException();

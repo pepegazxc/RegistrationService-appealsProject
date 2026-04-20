@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface MayorRequestStatusRepository extends JpaRepository<MayorRequestStatusEntity, Long> {
-    Optional<MayorRequestStatusEntity> findByStatusName(String statusName);
+    Optional<MayorRequestStatusEntity> findByStatus(String status);
 }
