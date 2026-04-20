@@ -1,7 +1,13 @@
 package main.exception.request;
 
-public class RequestExpiredException extends RuntimeException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class RequestExpiredException extends AppException {
     public RequestExpiredException() {
-        super();
+        super(
+                HttpStatus.GONE,
+                "Admin request has been expired"
+        );
     }
 }

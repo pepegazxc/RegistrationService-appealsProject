@@ -1,7 +1,13 @@
 package main.exception.user;
 
-public class UserNotFoundException extends RuntimeException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class UserNotFoundException extends AppException {
     public UserNotFoundException() {
-        super();
+        super(
+                HttpStatus.NOT_FOUND,
+                "Invalid email or password."
+        );
     }
 }

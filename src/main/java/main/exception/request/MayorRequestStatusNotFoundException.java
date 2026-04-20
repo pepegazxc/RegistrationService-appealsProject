@@ -1,7 +1,13 @@
 package main.exception.request;
 
-public class MayorRequestStatusNotFoundException extends RuntimeException {
-    public MayorRequestStatusNotFoundException( ) {
-        super();
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class MayorRequestStatusNotFoundException extends AppException {
+    public MayorRequestStatusNotFoundException() {
+        super(
+                HttpStatus.NOT_FOUND,
+                "Mayor request status not found"
+        );
     }
 }

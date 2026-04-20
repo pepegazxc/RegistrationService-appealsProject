@@ -1,7 +1,13 @@
 package main.exception.security;
 
-public class EmptySecurityContextException extends IllegalStateException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class EmptySecurityContextException extends AppException {
     public EmptySecurityContextException() {
-        super();
+        super(
+                HttpStatus.UNAUTHORIZED,
+                "Security context is empty.Pleas log in again"
+        );
     }
 }

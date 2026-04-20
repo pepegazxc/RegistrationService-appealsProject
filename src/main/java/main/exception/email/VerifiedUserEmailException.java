@@ -1,7 +1,13 @@
 package main.exception.email;
 
-public class VerifiedUserEmailException extends RuntimeException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class VerifiedUserEmailException extends AppException {
     public VerifiedUserEmailException() {
-        super();
+        super(
+                HttpStatus.NOT_MODIFIED,
+                "Your email has already been verified"
+        );
     }
 }

@@ -1,7 +1,13 @@
 package main.exception.email;
 
-public class UsedEmailTokenException extends RuntimeException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class UsedEmailTokenException extends AppException {
     public UsedEmailTokenException() {
-        super();
+        super(
+                HttpStatus.NOT_MODIFIED,
+                "Your email verification token has already been used"
+        );
     }
 }

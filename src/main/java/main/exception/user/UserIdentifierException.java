@@ -1,7 +1,13 @@
 package main.exception.user;
 
-public class UserIdentifierException extends RuntimeException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class UserIdentifierException extends AppException {
     public UserIdentifierException( ) {
-        super();
+        super(
+                HttpStatus.CONFLICT,
+                "Failed to generate unique user identifier. Please try again."
+        );
     }
 }
