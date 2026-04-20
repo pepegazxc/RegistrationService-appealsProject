@@ -4,14 +4,14 @@ import org.springframework.http.HttpStatus;
 
 public abstract class AppException extends RuntimeException {
     private final HttpStatus status;
-    private final String message;
+    private final String publicMessage;
 
 
-    protected AppException(HttpStatus status, String message) {
+    protected AppException(HttpStatus status, String publicMessage) {
         this.status = status;
-        this.message = message;
+        this.publicMessage = publicMessage;
     }
 
     public HttpStatus status() {return status;}
-    public String message() {return  message;}
+    public String publicMessage() {return  publicMessage;}
 }
