@@ -1,7 +1,13 @@
 package main.exception.request;
 
-public class RequestIsUsedException extends RuntimeException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class RequestIsUsedException extends AppException {
     public RequestIsUsedException( ) {
-        super();
+        super(
+                HttpStatus.CONFLICT,
+                "Admin request is already used"
+        );
     }
 }

@@ -1,7 +1,13 @@
 package main.exception.user;
 
-public class RoleNotFoundException extends RuntimeException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class RoleNotFoundException extends AppException {
     public RoleNotFoundException( ) {
-        super();
+        super(
+                HttpStatus.NOT_FOUND,
+                "Role not found. Please choose user, admin or mayor."
+        );
     }
 }

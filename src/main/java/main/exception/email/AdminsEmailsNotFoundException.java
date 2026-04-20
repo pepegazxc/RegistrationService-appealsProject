@@ -1,7 +1,13 @@
 package main.exception.email;
 
-public class AdminsEmailsNotFoundException extends RuntimeException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class AdminsEmailsNotFoundException extends AppException {
     public AdminsEmailsNotFoundException() {
-        super();
+        super(
+                HttpStatus.NOT_FOUND,
+                "Admins emails not found"
+        );
     }
 }

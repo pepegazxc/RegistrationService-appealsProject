@@ -1,7 +1,13 @@
 package main.exception.user;
 
-public class EmailAlreadyExistsException extends RuntimeException {
-    public EmailAlreadyExistsException( ) {
-        super();
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class EmailAlreadyExistsException extends AppException {
+    public EmailAlreadyExistsException() {
+        super(
+                HttpStatus.CONFLICT,
+                "User with that email exists."
+        );
     }
 }

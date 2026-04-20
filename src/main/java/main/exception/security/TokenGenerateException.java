@@ -1,7 +1,13 @@
 package main.exception.security;
 
-public class TokenGenerateException extends RuntimeException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class TokenGenerateException extends AppException {
     public TokenGenerateException() {
-        super();
+        super(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Failed to generate JWT token. Please try again."
+        );
     }
 }

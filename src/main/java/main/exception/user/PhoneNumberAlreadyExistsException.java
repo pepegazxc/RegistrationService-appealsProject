@@ -1,7 +1,13 @@
 package main.exception.user;
 
-public class PhoneNumberAlreadyExistsException extends RuntimeException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class PhoneNumberAlreadyExistsException extends AppException {
     public PhoneNumberAlreadyExistsException( ) {
-        super();
+        super(
+                HttpStatus.CONFLICT,
+                "User with that phone number already exist."
+        );
     }
 }

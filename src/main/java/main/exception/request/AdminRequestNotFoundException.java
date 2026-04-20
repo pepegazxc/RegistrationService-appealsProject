@@ -1,7 +1,13 @@
 package main.exception.request;
 
-public class AdminRequestNotFoundException extends RuntimeException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class AdminRequestNotFoundException extends AppException {
     public AdminRequestNotFoundException() {
-        super();
+        super(
+                HttpStatus.NOT_FOUND,
+                "Admin request not found. Please check correctness of data entry"
+        );
     }
 }

@@ -7,8 +7,7 @@ public abstract class AppException extends RuntimeException {
     private final String message;
 
 
-    protected AppException(String details, HttpStatus status, String message) {
-        super(details);
+    protected AppException(HttpStatus status, String message) {
         this.status = status;
         this.message = message;
     }

@@ -1,7 +1,13 @@
 package main.exception.request;
 
-public class RequestActionNotFoundException extends RuntimeException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class RequestActionNotFoundException extends AppException {
     public RequestActionNotFoundException( ) {
-        super();
+        super(
+                HttpStatus.NOT_FOUND,
+                "Wrong action to request. Choose between REJECTED and APPROVED"
+        );
     }
 }

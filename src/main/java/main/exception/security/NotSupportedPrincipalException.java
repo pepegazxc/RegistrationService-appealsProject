@@ -1,7 +1,13 @@
 package main.exception.security;
 
-public class NotSupportedPrincipalException extends IllegalStateException {
+import main.exception.AppException;
+import org.springframework.http.HttpStatus;
+
+public class NotSupportedPrincipalException extends AppException {
     public NotSupportedPrincipalException() {
-        super();
+        super(
+                HttpStatus.UNAUTHORIZED,
+                "Principal is not supported.Please log in again"
+        );
     }
 }
