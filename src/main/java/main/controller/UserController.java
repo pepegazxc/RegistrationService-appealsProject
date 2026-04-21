@@ -46,7 +46,7 @@ public class UserController {
                 );
     }
 
-    @PostMapping("/token/refresh")
+    @GetMapping("/token/refresh")
     public ResponseEntity<RefreshTokenResponse> refreshToken(){
         String jwtToken = jwt.generateJwtTokenForCurrentUser();
         return ResponseEntity.ok(
