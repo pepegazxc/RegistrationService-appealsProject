@@ -8,6 +8,7 @@ import main.exception.user.RegistrationFailedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.mail.MailSendException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,12 +30,20 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MailSendException.class)
-    public ResponseEntity<ExceptionResponse> handeMailSend(MailSendException ex){
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new ExceptionResponse(
-                        "Something went wrong while mail sending"
-                )
+    public ResponseEntity<ExceptionResponse> handeMailSend(){
+        return factory.build(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Something went wrong while mail sending"
         );
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ExceptionResponse> handleMessageNotReadableException(){
+        return factory.build(
+                HttpStatus.BAD_REQUEST,
+                "Wrong role. Available values: user, admin, mayor"
+        );
+
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

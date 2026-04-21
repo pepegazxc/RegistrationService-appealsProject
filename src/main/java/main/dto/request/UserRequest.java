@@ -35,5 +35,6 @@ public class UserRequest{
     @Pattern(regexp = "^\\d{7,18}$", message = "Your phone number must contains 7-18 digits")
     private String phoneNumber;
 
+    @NotNull(message = "Role is required")
     private RolesEnum role;
 }
