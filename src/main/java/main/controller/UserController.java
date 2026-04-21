@@ -3,7 +3,6 @@ package main.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import main.dto.request.RequestsActionRequest;
 import main.dto.response.*;
 import main.dto.request.UserRequest;
 import main.service.application.*;
@@ -16,19 +15,16 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final RegistrationService registrationService;
-    private final AdminRequestService adminRequestService;
     private final AuthService auth;
     private final AuthTokenService jwt;
     private final EmailConfirmationResultService emailConfirmationResultService;
-    private final MayorRequestService mayorRequestService;
 
-    public UserController(RegistrationService registrationService, AdminRequestService adminRequestService, AuthService auth, AuthTokenService jwt, EmailVerificationService email, EmailConfirmationResultService emailConfirmationResultService, MayorRequestService mayorRequestService) {
+
+    public UserController(RegistrationService registrationService, AuthService auth, AuthTokenService jwt, EmailConfirmationResultService emailConfirmationResultService) {
         this.registrationService = registrationService;
-        this.adminRequestService = adminRequestService;
         this.auth = auth;
         this.jwt = jwt;
         this.emailConfirmationResultService = emailConfirmationResultService;
-        this.mayorRequestService = mayorRequestService;
     }
 
     @PostMapping("/registration")
@@ -46,7 +42,7 @@ public class UserController {
                 );
     }
 
-    @PostMapping("/token/refresh")
+    @GetMapping("/token/refresh")
     public ResponseEntity<RefreshTokenResponse> refreshToken(){
         String jwtToken = jwt.generateJwtTokenForCurrentUser();
         return ResponseEntity.ok(
@@ -69,25 +65,5 @@ public class UserController {
         );
     }
 
-    @PatchMapping("/admin/request")
-    public ResponseEntity<ConfirmRequestsResponse> confirmAdminRequest(@RequestParam String token, @RequestBody @Valid RequestsActionRequest adminAction){
-        adminRequestService.handleAdminRequest(token, adminAction);
 
-        return ResponseEntity.ok().body(
-                new ConfirmRequestsResponse(
-                    "Request information has successfully changed"
-                )
-        );
-    }
-
-    @PatchMapping("/mayor/request")
-    public ResponseEntity<ConfirmRequestsResponse> confirmMayorRequest(@RequestParam String token, @RequestBody @Valid RequestsActionRequest mayorAction){
-        mayorRequestService.handleMayorRequest(token, mayorAction);
-
-        return ResponseEntity.ok().body(
-                new ConfirmRequestsResponse(
-                        "Request information has successfully changed"
-                )
-        );
-    }
 }
