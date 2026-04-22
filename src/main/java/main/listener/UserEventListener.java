@@ -1,9 +1,6 @@
 package main.listener;
 
-import main.event.AdminRequestEvent;
-import main.event.MayorRequestEvent;
-import main.event.RegistrationEvent;
-import main.event.RequestResponseEvent;
+import main.event.*;
 import main.service.application.RequestResponseResultService;
 import main.service.infrastructure.mail.MailService;
 import org.springframework.beans.factory.annotation.Value;
@@ -81,6 +78,16 @@ public class UserEventListener {
                 mayorResponseEvent.getEmail(),
                 "Mayor request results",
                 resultService.handleRequestResult(mayorResponseEvent.getAction())
+        );
+    }
+
+    @Async
+    @EventListener
+    public void handleLoginMail(LoginEvent loginEvent){
+        mailService.sendMail(
+                loginEvent.getEmail(),
+                "Successful login",
+                "Successful login was made. Time: " + loginEvent.getTime()
         );
     }
 }
