@@ -19,7 +19,7 @@ public class ConstraintViolationMapper {
                 new PhoneNumberAlreadyExistsException();
             case "users_identifier_key" ->
                 new UserIdentifierException();
-            case "one_admin_request_per_user" ->
+            case "one_admin_request_per_user", "one_mayor_request_per_user" ->
                 new RequestNotAllowedException();
             default ->
                     new RegistrationFailedException();
