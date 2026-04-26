@@ -19,18 +19,32 @@ public class MailService implements MailSender {
 
     @Override
     public void sendMail(String to, String subject, String text) {
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(to);
-        mailMessage.setSubject(subject);
-        mailMessage.setText(text);
+        int attempts = 0;
+        int maxAttempts = 3;
 
-        try {
-            mailSender.send(mailMessage);
-        }catch (MailException ex){
-            log.error("Failed to send email to " + to + "ex: " + ex);
-            throw new MailSendException(
-                    "Failed to send email to " + to, ex
-            );
+        while (attempts < maxAttempts) {
+            try {
+                SimpleMailMessage mailMessage = new SimpleMailMessage();
+                mailMessage.setTo(to);
+                mailMessage.setSubject(subject);
+                mailMessage.setText(text);
+
+                mailSender.send(mailMessage);
+                return;
+
+            } catch(MailException ex) {
+                attempts++;
+                log.error("Attempt {} failed to send mail to {}", attempts, to ,ex);
+
+                if (attempts >= maxAttempts) throw new MailSendException("Failed after retries", ex);
+
+                try {
+                    Thread.sleep(3000 * attempts);
+                }catch (InterruptedException e){
+                    Thread.currentThread().interrupt();
+                    throw new MailSendException("Retry interrupted", e);
+                }
+                }
         }
     }
 }
