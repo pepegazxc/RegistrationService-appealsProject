@@ -11,8 +11,10 @@ import main.service.application.RegistrationService;
 import main.service.application.RoleService;
 import main.service.infrastructure.CipherService;
 import main.service.support.UserIdentifierService;
+import org.apache.kafka.common.config.types.Password;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,6 +22,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RegistrationTest {
@@ -27,7 +30,7 @@ public class RegistrationTest {
 
     @Mock private  UserRepository userRepository;
     @Mock private  CipherService cipher;
-    @Mock private  PasswordEncoder encoder;
+    @Mock private PasswordEncoder encoder;
     @Mock private  UserIdentifierService userIdentifier;
     @Mock private  EmailVerificationService emailService;
     @Mock private  ApplicationEventPublisher publisher;
@@ -52,12 +55,34 @@ public class RegistrationTest {
         when(roleService.findRole(request.getRole().toString()))
                 .thenReturn(fakeRole);
 
-        when(cipher.encrypt(anyString())).thenReturn("encryptedStr");
+        when(emailService.generateTokenForEmail(any(UsersEntity.class)))
+                .thenReturn("token");
+
+        when(cipher.decrypt(any())).thenReturn("UserEmail@gmail.com");
+
+        when(userIdentifier.generate()).thenReturn("USR-111");
+
+        when(encoder.encode((any()))).thenReturn("hash");
+
 
         registration.registration(request);
 
-        verify(userRepository).save(any());
-        verify(publisher).publishEvent(any(RegistrationEvent.class));
-        verify(emailService).generateTokenForEmail(any());
+        ArgumentCaptor<UsersEntity> captorUser = ArgumentCaptor.forClass(UsersEntity.class);
+        ArgumentCaptor<RegistrationEvent> captorEvent = ArgumentCaptor.forClass(RegistrationEvent.class);
+
+        verify(userRepository).save(captorUser.capture());
+
+        UsersEntity fakeUser = captorUser.getValue();
+        assertEquals(fakeRole, fakeUser.getRole(), "Roles must be equals");
+
+        verify(publisher).publishEvent(captorEvent.capture());
+
+        RegistrationEvent fakeEvent = captorEvent.getValue();
+        assertNotNull(fakeEvent.getEmail(), "Email must not be empty");
+        assertNotNull(fakeEvent.getToken(), "Token for email confirm must not be empty");
+        assertEquals("token", fakeEvent.getToken(), "Token should match generated one");
+
+        verify(emailService).generateTokenForEmail(fakeUser);
+
     }
 }
