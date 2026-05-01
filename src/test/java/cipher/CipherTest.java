@@ -2,6 +2,7 @@ package cipher;
 
 import main.service.infrastructure.CipherService;
 import org.jasypt.encryption.StringEncryptor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,8 +23,8 @@ public class CipherTest {
 
     @Test
     public void testCipherEncrypt_success(){
-        String input = "1234567890";
-        String encypted = "encypted";
+        String input = "input";
+        String encypted = "output";
 
         when(encryptor.encrypt(input)).thenReturn(encypted);
 
@@ -33,4 +34,18 @@ public class CipherTest {
         verify(encryptor).encrypt(input);
 
     }
+
+    @Test
+    public void testCipherDecrypt_success(){
+        String str = "encryptedString";
+        String decrypted = "decrypted";
+
+        when(encryptor.decrypt(str)).thenReturn(decrypted);
+
+        String result = cipherService.decrypt(str);
+
+        assertEquals(decrypted, result);
+        verify(encryptor).decrypt(str);
+    }
+
 }
