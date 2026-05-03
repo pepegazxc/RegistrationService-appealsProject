@@ -1,5 +1,6 @@
 package cipher;
 
+import main.exception.cryptography.DecryptException;
 import main.exception.cryptography.EncryptException;
 import main.service.infrastructure.CipherService;
 import org.jasypt.encryption.StringEncryptor;
@@ -50,10 +51,17 @@ public class CipherTest {
     }
 
     @Test
-    public void encryptor_failed_shouldReturnEncryptException(){
+    public void encrypt_failed_shouldReturnEncryptException(){
         when(encryptor.encrypt(anyString())).thenThrow(new EncryptException());
 
         assertThrows(EncryptException.class, () -> cipherService.encrypt("str"));
+    }
+
+    @Test
+    public void decrypt_failed_shouldReturnDecryptException(){
+        when(encryptor.decrypt(anyString())).thenThrow(new DecryptException());
+
+        assertThrows(DecryptException.class, () -> cipherService.decrypt("str"));
     }
 
 }
