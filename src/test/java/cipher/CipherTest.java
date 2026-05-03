@@ -1,8 +1,8 @@
 package cipher;
 
+import main.exception.cryptography.EncryptException;
 import main.service.infrastructure.CipherService;
 import org.jasypt.encryption.StringEncryptor;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,6 +47,13 @@ public class CipherTest {
 
         assertEquals(decrypted, result);
         verify(encryptor).decrypt(str);
+    }
+
+    @Test
+    public void encryptor_failed_shouldReturnEncryptException(){
+        when(encryptor.encrypt(anyString())).thenThrow(new EncryptException());
+
+        assertThrows(EncryptException.class, () -> cipherService.encrypt("str"));
     }
 
 }
