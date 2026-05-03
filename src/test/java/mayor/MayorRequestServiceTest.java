@@ -29,7 +29,7 @@ public class MayorRequestServiceTest {
     private MayorRequestService mayorRequestService;
 
     @Test
-    public void addMayorRequest_successful(){
+    public void addMayorRequest_successful_shouldAddMayorRequest(){
         UsersEntity fakeUser = new UsersEntity();
         fakeUser.setId(1L);
 

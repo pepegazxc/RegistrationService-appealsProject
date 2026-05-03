@@ -11,7 +11,6 @@ import main.service.application.RegistrationService;
 import main.service.application.RoleService;
 import main.service.infrastructure.CipherService;
 import main.service.support.UserIdentifierService;
-import org.apache.kafka.common.config.types.Password;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -41,7 +40,7 @@ public class RegistrationTest {
 
 
     @Test
-    public void registerNewUser_successful(){
+    public void registration_success_shouldRegisterUserWithUserRole(){
         UserRequest request = new UserRequest();
         request.setName("UserName");
         request.setSurname("UserSurname");

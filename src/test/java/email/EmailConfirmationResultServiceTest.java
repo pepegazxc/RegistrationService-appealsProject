@@ -31,7 +31,7 @@ public class EmailConfirmationResultServiceTest {
     private EmailConfirmationResultService service;
 
     @Test
-    public void confirmationResult_UserRole_successful(){
+    public void confirmationResult_success_shouldReturnJwt(){
         String fakeToken = "token";
         RolesEntity fakeRole = new RolesEntity();
         fakeRole.setRoleName("USER");

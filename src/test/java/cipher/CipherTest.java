@@ -24,7 +24,7 @@ public class CipherTest {
     private CipherService cipherService;
 
     @Test
-    public void testCipherEncrypt_success(){
+    public void encrypt_success_shouldEncryptString(){
         String input = "input";
         String encypted = "output";
 
@@ -38,7 +38,7 @@ public class CipherTest {
     }
 
     @Test
-    public void testCipherDecrypt_success(){
+    public void decrypt_success_shouldDecryptString(){
         String str = "encryptedString";
         String decrypted = "decrypted";
 

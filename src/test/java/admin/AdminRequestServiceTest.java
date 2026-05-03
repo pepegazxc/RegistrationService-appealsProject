@@ -30,7 +30,7 @@ public class AdminRequestServiceTest {
     private AdminRequestService adminRequestService;
 
     @Test
-    public void addAdminRequest_successful(){
+    public void addAdminRequest_success_shouldAddAdminRequest(){
         UsersEntity fakeUser = new UsersEntity();
         fakeUser.setId(1L);
 
