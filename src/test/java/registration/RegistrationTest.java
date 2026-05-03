@@ -5,6 +5,8 @@ import main.dto.request.UserRequest;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
 import main.event.RegistrationEvent;
+import main.exception.user.RoleNotFoundException;
+import main.exception.user.UserIdentifierException;
 import main.repository.UserRepository;
 import main.service.application.EmailVerificationService;
 import main.service.application.RegistrationService;
@@ -161,5 +163,48 @@ public class RegistrationTest {
 
             verify(emailService).generateTokenForEmail(fakeUser);
         }
+    }
+
+    @Nested
+    class FailedRegistration{
+
+        @BeforeEach
+        void failedSetUp(){
+            request.setRole(RolesEnum.user);
+        }
+
+        @Test
+        public void registration_failed_shouldReturnRoleNotFoundException(){
+            when(roleService.findRole(anyString())).thenThrow(new RoleNotFoundException());
+
+            assertThrows(RoleNotFoundException.class, () ->
+                    registration.registration(request));
+
+            verify(userRepository, never()).save(any());
+        }
+        @Test
+        public void registration_failed_shouldReturnUserIdentifierException(){
+            when(userIdentifier.generate()).thenThrow(new UserIdentifierException());
+
+            assertThrows(UserIdentifierException.class, () ->
+                    registration.registration(request));
+
+            verify(userRepository, never()).save(any());
+        }
+
+        @Test
+        public void registration_failed_tooManyIdentifierAttempts(){
+            when(userRepository.existsByUserIdentifier(anyString())).thenReturn(true);
+            when(userIdentifier.generate()).thenReturn("USER");
+
+            assertThrows(UserIdentifierException.class, () -> {
+                registration.registration(request);
+            });
+
+            verify(userIdentifier, atLeast(10)).generate();
+
+            verify(userRepository, never()).save(any());
+        }
+
     }
 }

@@ -5,6 +5,7 @@ import main.dto.request.UserRequest;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
 import main.event.RegistrationEvent;
+import main.exception.user.UserIdentifierException;
 import main.exception.user.UserNotFoundException;
 import main.repository.UserRepository;
 import main.service.infrastructure.CipherService;
@@ -80,9 +81,12 @@ public class RegistrationService implements UserDetailsService {
     }
 
     private String generateUserIdentifier(){
+        int attempts = 0;
         String identifier;
         do{
             identifier = userIdentifier.generate();
+            attempts++;
+            if(attempts > 10) throw new UserIdentifierException();
         } while (userRepository.existsByUserIdentifier(identifier));
         return identifier;
     }
