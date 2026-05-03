@@ -11,6 +11,8 @@ import main.service.application.RegistrationService;
 import main.service.application.RoleService;
 import main.service.infrastructure.CipherService;
 import main.service.support.UserIdentifierService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -38,50 +40,126 @@ public class RegistrationTest {
     @InjectMocks
     private RegistrationService registration;
 
+    private UserRequest request;
+    private RolesEntity fakeRole;
 
-    @Test
-    public void registration_success_shouldRegisterUserWithUserRole(){
-        UserRequest request = new UserRequest();
+    @BeforeEach
+    void globalSetUp(){
+        request = new UserRequest();
         request.setName("UserName");
         request.setSurname("UserSurname");
         request.setEmail("UserEmail@gmail.com");
         request.setPassword("1234567890");
         request.setPhoneNumber("1234567890");
-        request.setRole(RolesEnum.user);
 
-        RolesEntity fakeRole = new RolesEntity();
-        fakeRole.setRoleName("user");
-        when(roleService.findRole(request.getRole().toString()))
-                .thenReturn(fakeRole);
+        fakeRole = new RolesEntity();
+    }
 
-        when(emailService.generateTokenForEmail(any(UsersEntity.class)))
-                .thenReturn("token");
+    @Nested
+    class SuccessRegistration {
 
-        when(cipher.decrypt(any())).thenReturn("UserEmail@gmail.com");
+        @BeforeEach
+        void successSetUp(){
+            when(emailService.generateTokenForEmail(any(UsersEntity.class)))
+                    .thenReturn("token");
+            when(cipher.decrypt(any())).thenReturn("UserEmail@gmail.com");
+            when(userIdentifier.generate()).thenReturn("USR-111");
+            when(encoder.encode((any()))).thenReturn("hash");
+        }
 
-        when(userIdentifier.generate()).thenReturn("USR-111");
+        @Test
+        public void registration_success_shouldRegisterUserWithUserRole() {
+            request.setRole(RolesEnum.user);
 
-        when(encoder.encode((any()))).thenReturn("hash");
+            fakeRole.setRoleName("user");
+
+            when(roleService.findRole(request.getRole().toString()))
+                    .thenReturn(fakeRole);
+
+            registration.registration(request);
+
+            ArgumentCaptor<UsersEntity> captorUser = ArgumentCaptor.forClass(UsersEntity.class);
+            ArgumentCaptor<RegistrationEvent> captorEvent = ArgumentCaptor.forClass(RegistrationEvent.class);
+
+            verify(userRepository).save(captorUser.capture());
+
+            UsersEntity fakeUser = captorUser.getValue();
+            assertEquals(fakeRole, fakeUser.getRole(), "Roles must be equals");
+
+            verify(publisher).publishEvent(captorEvent.capture());
+
+            RegistrationEvent fakeEvent = captorEvent.getValue();
+            assertNotNull(fakeEvent.getEmail(), "Email must not be empty");
+            assertNotNull(fakeEvent.getToken(), "Token for email confirm must not be empty");
+            assertEquals("token", fakeEvent.getToken(), "Token should match generated one");
+
+            verify(emailService).generateTokenForEmail(fakeUser);
+        }
+
+        @Test
+        public void registration_success_shouldRegisterNewUserWithPendingAdminRole() {
+            request.setRole(RolesEnum.admin);
+
+            fakeRole.setRoleName("PENDING_ADMIN");
+
+            when(roleService.findRole("PENDING_ADMIN"))
+                    .thenReturn(fakeRole);
+
+            registration.registration(request);
+
+            ArgumentCaptor<UsersEntity> captorUser = ArgumentCaptor.forClass(UsersEntity.class);
+            ArgumentCaptor<RegistrationEvent> captorEvent = ArgumentCaptor.forClass(RegistrationEvent.class);
+
+            verify(roleService).findRole("PENDING_ADMIN");
+            verify(userRepository).save(captorUser.capture());
+            verify(userRepository).save(argThat(user ->
+                    user.getRole().getRoleName().equals("PENDING_ADMIN")));
+
+            UsersEntity fakeUser = captorUser.getValue();
+            assertEquals(fakeRole, fakeUser.getRole(), "Roles must be equals");
 
 
-        registration.registration(request);
+            verify(publisher).publishEvent(captorEvent.capture());
 
-        ArgumentCaptor<UsersEntity> captorUser = ArgumentCaptor.forClass(UsersEntity.class);
-        ArgumentCaptor<RegistrationEvent> captorEvent = ArgumentCaptor.forClass(RegistrationEvent.class);
+            RegistrationEvent fakeEvent = captorEvent.getValue();
+            assertNotNull(fakeEvent.getEmail(), "Email must not be empty");
+            assertNotNull(fakeEvent.getToken(), "Token for email confirm must not be empty");
+            assertEquals("token", fakeEvent.getToken(), "Token should match generated one");
 
-        verify(userRepository).save(captorUser.capture());
+            verify(emailService).generateTokenForEmail(fakeUser);
+        }
 
-        UsersEntity fakeUser = captorUser.getValue();
-        assertEquals(fakeRole, fakeUser.getRole(), "Roles must be equals");
+        @Test
+        public void registration_success_shouldRegisterNewUserWithPendingMayorRole() {
+            request.setRole(RolesEnum.mayor);
 
-        verify(publisher).publishEvent(captorEvent.capture());
+            fakeRole.setRoleName("PENDING_MAYOR");
 
-        RegistrationEvent fakeEvent = captorEvent.getValue();
-        assertNotNull(fakeEvent.getEmail(), "Email must not be empty");
-        assertNotNull(fakeEvent.getToken(), "Token for email confirm must not be empty");
-        assertEquals("token", fakeEvent.getToken(), "Token should match generated one");
+            when(roleService.findRole("PENDING_MAYOR"))
+                    .thenReturn(fakeRole);
 
-        verify(emailService).generateTokenForEmail(fakeUser);
+            registration.registration(request);
 
+            ArgumentCaptor<UsersEntity> captorUser = ArgumentCaptor.forClass(UsersEntity.class);
+            ArgumentCaptor<RegistrationEvent> captorEvent = ArgumentCaptor.forClass(RegistrationEvent.class);
+
+            verify(roleService).findRole("PENDING_MAYOR");
+            verify(userRepository).save(captorUser.capture());
+            verify(userRepository).save(argThat(user ->
+                    user.getRole().getRoleName().equals("PENDING_MAYOR")));
+
+            UsersEntity fakeUser = captorUser.getValue();
+            assertEquals(fakeRole, fakeUser.getRole(), "Roles must be equals");
+
+
+            verify(publisher).publishEvent(captorEvent.capture());
+
+            RegistrationEvent fakeEvent = captorEvent.getValue();
+            assertNotNull(fakeEvent.getEmail(), "Email must not be empty");
+            assertNotNull(fakeEvent.getToken(), "Token for email confirm must not be empty");
+            assertEquals("token", fakeEvent.getToken(), "Token should match generated one");
+
+            verify(emailService).generateTokenForEmail(fakeUser);
+        }
     }
 }
