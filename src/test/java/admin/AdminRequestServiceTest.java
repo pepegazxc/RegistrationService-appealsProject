@@ -9,6 +9,10 @@ import main.entity.UsersEntity;
 import main.event.AdminRequestEvent;
 import main.event.RegistrationEvent;
 import main.event.RequestResponseEvent;
+import main.exception.request.AdminRequestNotFoundException;
+import main.exception.request.AdminRequestStatusNotFoundException;
+import main.exception.request.RequestExpiredException;
+import main.exception.request.RequestIsUsedException;
 import main.repository.AdminRequestRepository;
 import main.service.application.AdminRequestService;
 import main.service.application.AdminRequestStatusService;
@@ -93,7 +97,7 @@ public class AdminRequestServiceTest {
         }
 
         @Test
-        void handleAdminRequest_success_shouldHandleApprovedAdminRequest() {
+        public void handleAdminRequest_success_shouldHandleApprovedAdminRequest() {
             action.setAction(RequestsActionEnum.APPROVED);
             fakeUser.setCipherEmail("encrypted@email");
             fakeRequest.setId(1L);
@@ -135,7 +139,7 @@ public class AdminRequestServiceTest {
             assertEquals(RequestsActionEnum.APPROVED, event.getAction());
         }
         @Test
-        void handleAdminRequest_success_shouldHandleRejectedAdminRequest() {
+        public void handleAdminRequest_success_shouldHandleRejectedAdminRequest() {
             action.setAction(RequestsActionEnum.REJECTED);
             fakeUser.setCipherEmail("encrypted@email");
             fakeRequest.setId(1L);
@@ -176,5 +180,73 @@ public class AdminRequestServiceTest {
             assertEquals("test@mail.com", event.getEmail());
             assertEquals(RequestsActionEnum.REJECTED, event.getAction());
         }
+    }
+
+    @Nested
+    class FailedAdd {
+        @Test
+        public void addAdminRequest_failed_shouldReturnStatusNotFoundException(){
+            fakeUser.setId(1L);
+            fakeStatus.setStatus("fake-status");
+            fakeRequest.setId(1L);
+            fakeRequest.setIsUsed(false);
+            fakeRequest.setExpiresAt(LocalDateTime.now().plusDays(999));
+            fakeRequest.setUser(fakeUser);
+
+            when(adminRequestStatusService.findAdminRequestStatus(any()))
+                    .thenThrow(new AdminRequestStatusNotFoundException());
+
+            assertThrows(AdminRequestStatusNotFoundException.class,
+                    () -> adminRequestService.addAdminRequest(fakeUser));
+        }
+    }
+    @Test
+    public void handleAdminRequest_failed_shouldReturnRequestIsUsedException(){
+        action.setAction(RequestsActionEnum.APPROVED);
+        fakeUser.setId(1L);
+        fakeStatus.setStatus("fake-status");
+        fakeRequest.setId(1L);
+        fakeRequest.setIsUsed(true);
+        fakeRequest.setExpiresAt(LocalDateTime.now().plusDays(999));
+        fakeRequest.setUser(fakeUser);
+
+        when(adminRequestRepository.findByToken("token"))
+                .thenReturn(Optional.of(fakeRequest));
+
+        assertThrows(RequestIsUsedException.class,
+                () -> adminRequestService.handleAdminRequest("token",action ));
+    }
+
+    @Test
+    public void handleAdminRequest_failed_shouldReturnRequestNotFoundException(){
+        action.setAction(RequestsActionEnum.APPROVED);
+        fakeUser.setId(1L);
+        fakeStatus.setStatus("fake-status");
+        fakeRequest.setId(1L);
+        fakeRequest.setIsUsed(true);
+        fakeRequest.setExpiresAt(LocalDateTime.now().plusDays(999));
+        fakeRequest.setUser(fakeUser);
+
+        when(adminRequestRepository.findByToken("token"))
+                .thenThrow(new AdminRequestNotFoundException());
+
+        assertThrows(AdminRequestNotFoundException.class,
+                () -> adminRequestService.handleAdminRequest("token", action));
+    }
+    @Test
+    public void handleAdminRequest_failed_shouldReturnTokenIsExpired(){
+        action.setAction(RequestsActionEnum.APPROVED);
+        fakeUser.setId(1L);
+        fakeStatus.setStatus("fake-status");
+        fakeRequest.setId(1L);
+        fakeRequest.setIsUsed(false);
+        fakeRequest.setExpiresAt(LocalDateTime.now().minusDays(1));
+        fakeRequest.setUser(fakeUser);
+
+        when(adminRequestRepository.findByToken("token"))
+                .thenReturn(Optional.of(fakeRequest));
+
+        assertThrows(RequestExpiredException.class,
+                () -> adminRequestService.handleAdminRequest("token", action));
     }
 }
