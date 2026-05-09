@@ -12,7 +12,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
-public class UserEventListener {
+public class KafkaListener {
 
     @Value("${app.url}")
     private String appUrl;
@@ -22,7 +22,7 @@ public class UserEventListener {
     private final MailService mailService;
     private final RequestResponseResultService resultService;
 
-    public UserEventListener(MailService mailService, RequestResponseResultService resultService) {
+    public KafkaListener(MailService mailService, RequestResponseResultService resultService) {
         this.mailService = mailService;
         this.resultService = resultService;
     }
