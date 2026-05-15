@@ -23,18 +23,6 @@ spring:
       host: ${REDIS_HOST}
       password: ${REDIS_PASSWORD}
 
-  mail:
-    host: ${MAIL_HOST}
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
   kafka:
     bootstrap-servers: localhost:9092
     producer:
