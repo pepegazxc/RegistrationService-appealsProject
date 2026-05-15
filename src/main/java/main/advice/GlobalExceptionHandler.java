@@ -35,15 +35,6 @@ public class GlobalExceptionHandler {
         return factory.build(ex);
     }
 
-    @ExceptionHandler(MailSendException.class)
-    public ResponseEntity<ExceptionResponse> handeMailSend(MailSendException ex){
-        log.error("Mail sending failed", ex);
-        return factory.build(
-                INTERNAL_SERVER_ERROR,
-                "Something went wrong while mail sending"
-        );
-    }
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ExceptionResponse> handleMessageNotReadableException(HttpMessageNotReadableException ex){
         log.warn("Invalid request body received: {}", ex.getMessage());
