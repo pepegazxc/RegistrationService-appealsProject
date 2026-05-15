@@ -2,6 +2,7 @@ package main.service.application;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,13 +14,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
-
-    public AuthService(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
 
     public void autoAuth(String email, String password, HttpServletRequest httpRequest){
         try {

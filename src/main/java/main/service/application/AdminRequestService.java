@@ -1,5 +1,6 @@
 package main.service.application;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.dto.enums.RequestsActionEnum;
 import main.dto.request.RequestsActionRequest;
@@ -12,6 +13,7 @@ import main.event.RequestResponseEvent;
 import main.exception.request.RequestExpiredException;
 import main.exception.request.AdminRequestNotFoundException;
 import main.exception.request.RequestIsUsedException;
+import main.producer.KafkaProducer;
 import main.repository.AdminRequestRepository;
 import main.service.infrastructure.CipherService;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,6 +25,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AdminRequestService {
 
     private final AdminRequestRepository adminRequestRepository;
@@ -30,14 +33,7 @@ public class AdminRequestService {
     private final RoleService roleService;
     private final AdminRequestStatusService adminRequestStatusService;
     private final CipherService cipher;
-
-    public AdminRequestService(AdminRequestRepository adminRequestRepository, ApplicationEventPublisher publisher, RoleService roleService, AdminRequestStatusService adminRequestStatusService,CipherService cipher) {
-        this.adminRequestRepository = adminRequestRepository;
-        this.publisher = publisher;
-        this.roleService = roleService;
-        this.adminRequestStatusService = adminRequestStatusService;
-        this.cipher = cipher;
-    }
+    private KafkaProducer kafka;
 
     @Transactional
     public void handleAdminRequest(String token, RequestsActionRequest actionRequest){
@@ -57,16 +53,10 @@ public class AdminRequestService {
 
         setNewStatusToUser(user, newRole);
 
-        /*
-        publisher.publishEvent(
-
-                new RequestResponseEvent(
-                        decryptEmail(user.getCipherEmail()),
-                        actionRequest.getAction()
-                )
+        kafka.handleRequestResponseMail(
+                decryptEmail(user.getCipherEmail()),
+                actionRequest.getAction()
         );
-
-         */
     }
 
     @Transactional
@@ -78,14 +68,9 @@ public class AdminRequestService {
 
         String token = admin.getToken();
 
-        /*
-        publisher.publishEvent(
-                new AdminRequestEvent(
-                        token
-                )
+        kafka.handleAdminRequestMail(
+                token
         );
-
-         */
     }
 
     private AdminRequestEntity buildAdminRequest(UsersEntity user, AdminRequestStatusEntity status){

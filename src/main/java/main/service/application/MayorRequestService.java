@@ -1,5 +1,6 @@
 package main.service.application;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.dto.enums.RequestsActionEnum;
 import main.dto.request.RequestsActionRequest;
@@ -11,8 +12,10 @@ import main.exception.request.MayorRequestNotFoundException;
 import main.exception.request.MayorRequestStatusNotFoundException;
 import main.exception.request.RequestExpiredException;
 import main.exception.request.RequestIsUsedException;
+import main.producer.KafkaProducer;
 import main.repository.MayorRequestRepository;
 import main.repository.MayorRequestStatusRepository;
+import main.service.infrastructure.CipherService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +24,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MayorRequestService {
 
     private final MayorRequestStatusService requestStatusService;
@@ -28,14 +32,8 @@ public class MayorRequestService {
     private final AdminsEmailsService adminsEmailsService;
     private final RoleService roleService;
     private final MayorRequestStatusRepository mayorRequestStatusRepository;
-
-    public MayorRequestService(MayorRequestStatusService requestStatusService, MayorRequestRepository mayorRequestRepository, AdminsEmailsService adminsEmailsService,RoleService roleService, MayorRequestStatusRepository mayorRequestStatusRepository) {
-        this.requestStatusService = requestStatusService;
-        this.mayorRequestRepository = mayorRequestRepository;
-        this.adminsEmailsService = adminsEmailsService;
-        this.roleService = roleService;
-        this.mayorRequestStatusRepository = mayorRequestStatusRepository;
-    }
+    private final KafkaProducer kafka;
+    private final CipherService cipher;
 
     @Transactional
     public void addMayorRequest(UsersEntity user){
@@ -66,6 +64,10 @@ public class MayorRequestService {
 
         setNewRole(user, role);
 
+        kafka.handleMayorRequestMail(
+                decryptEmail(user.getCipherEmail()),
+                token
+        );
     }
 
     private MayorRequestEntity buildMayorRequest(UsersEntity user, MayorRequestStatusEntity status){
@@ -108,5 +110,9 @@ public class MayorRequestService {
 
     private String generateTokenForMayorRequest(){
         return UUID.randomUUID().toString();
+    }
+
+    private String decryptEmail(String email){
+        return cipher.decrypt(email);
     }
 }

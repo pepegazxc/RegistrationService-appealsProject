@@ -24,9 +24,9 @@ public class KafkaProducer {
 
     }
 
-    public void handleAdminRequestMail(String email, String token){
+    public void handleAdminRequestMail(String token){
         AdminRequestEvent event = new AdminRequestEvent();
-        build(event,email, token);
+        event.setToken(token);
         kafka.send("admin-request", event);
     }
 

@@ -1,18 +1,16 @@
 package main.service.application;
 
+import lombok.RequiredArgsConstructor;
 import main.dto.enums.RequestsActionEnum;
 import main.exception.request.RequestActionNotFoundException;
 import main.service.infrastructure.jwt.AuthTokenService;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class RequestResponseResultService {
 
     private final AuthTokenService jwtService;
-
-    public RequestResponseResultService(AuthTokenService jwtService) {
-        this.jwtService = jwtService;
-    }
 
     public String handleRequestResult(RequestsActionEnum action){
 

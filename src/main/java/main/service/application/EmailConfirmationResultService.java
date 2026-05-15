@@ -1,5 +1,6 @@
 package main.service.application;
 
+import lombok.RequiredArgsConstructor;
 import main.dto.response.EmailConfirmResultResponse;
 import main.entity.UsersEntity;
 import main.service.infrastructure.jwt.AuthTokenService;
@@ -7,19 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class EmailConfirmationResultService {
 
     private final AuthTokenService jwt;
     private final EmailVerificationService email;
     private final AdminRequestService adminRequestService;
     private final MayorRequestService mayorRequestService;
-
-    public EmailConfirmationResultService(AuthTokenService jwt, EmailVerificationService email, AdminRequestService adminRequestService, MayorRequestService mayorRequestService) {
-        this.jwt = jwt;
-        this.email = email;
-        this.adminRequestService = adminRequestService;
-        this.mayorRequestService = mayorRequestService;
-    }
 
     @Transactional
     public EmailConfirmResultResponse confirmationResult(String token) {

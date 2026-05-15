@@ -1,5 +1,6 @@
 package main.service.application;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.entity.MayorRequestStatusEntity;
 import main.exception.request.MayorRequestStatusNotFoundException;
@@ -8,13 +9,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MayorRequestStatusService {
 
     private final MayorRequestStatusRepository statusRepository;
-
-    public MayorRequestStatusService(MayorRequestStatusRepository statusRepository) {
-        this.statusRepository = statusRepository;
-    }
 
     public MayorRequestStatusEntity findMayorRequestStatus(String statusName){
         return statusRepository.findByStatus(statusName)

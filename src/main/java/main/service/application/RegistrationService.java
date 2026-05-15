@@ -1,5 +1,6 @@
 package main.service.application;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.dto.request.UserRequest;
 import main.entity.RolesEntity;
@@ -7,6 +8,7 @@ import main.entity.UsersEntity;
 import main.event.RegistrationEvent;
 import main.exception.user.UserIdentifierException;
 import main.exception.user.UserNotFoundException;
+import main.producer.KafkaProducer;
 import main.repository.UserRepository;
 import main.service.infrastructure.CipherService;
 import main.service.support.UserIdentifierService;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class RegistrationService implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -27,19 +30,8 @@ public class RegistrationService implements UserDetailsService {
     private final PasswordEncoder encoder;
     private final UserIdentifierService userIdentifier;
     private final EmailVerificationService emailService;
-    private final ApplicationEventPublisher publisher;
+    private final KafkaProducer kafka;
     private final RoleService roleService;
-
-    public RegistrationService(UserRepository userRepository, CipherService cipher, PasswordEncoder encoder, UserIdentifierService userIdentifier, EmailVerificationService emailService, ApplicationEventPublisher publisher, RoleService roleService) {
-        this.userRepository = userRepository;
-        this.cipher = cipher;
-        this.encoder = encoder;
-        this.userIdentifier = userIdentifier;
-        this.emailService = emailService;
-        this.publisher = publisher;
-        this.roleService = roleService;
-    }
-
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -73,14 +65,10 @@ public class RegistrationService implements UserDetailsService {
 
         String token = emailService.generateTokenForEmail(user);
 
-        /*
-        publisher.publishEvent(new RegistrationEvent(
+        kafka.handleRegistration(
                 decryptEmail(user.getCipherEmail()),
                 token
-                )
         );
-
-         */
     }
 
     private String generateUserIdentifier(){

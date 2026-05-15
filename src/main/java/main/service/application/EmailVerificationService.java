@@ -1,5 +1,6 @@
 package main.service.application;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.entity.EmailVerificationTokensEntity;
 import main.entity.UsersEntity;
@@ -16,12 +17,9 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class EmailVerificationService {
     private final EmailVerificationTokensRepository emailVerificationRepository;
-
-    public EmailVerificationService(EmailVerificationTokensRepository emailVerificationRepository) {
-        this.emailVerificationRepository = emailVerificationRepository;
-    }
 
     public String generateTokenForEmail(UsersEntity user){
         EmailVerificationTokensEntity email = buildEmailTokenEntity(user);

@@ -1,40 +1,30 @@
 package main.service.application;
 
-import main.event.MayorRequestEvent;
+import lombok.RequiredArgsConstructor;
 import main.exception.email.AdminsEmailsNotFoundException;
+import main.producer.KafkaProducer;
 import main.repository.UserRepository;
 import main.service.infrastructure.CipherService;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class AdminsEmailsService {
 
     private final UserRepository userRepository;
     private final CipherService cipher;
-    private final ApplicationEventPublisher publisher;
-
-    public AdminsEmailsService(UserRepository userRepository, CipherService cipher, ApplicationEventPublisher publisher) {
-        this.userRepository = userRepository;
-        this.cipher = cipher;
-        this.publisher = publisher;
-    }
+    private final KafkaProducer kafka;
 
     public void sendMailToAdmins(String mayorToken){
         List<String> emails = getAdminsEmails();
 
         for(String email : emails) {
-            /*
-            publisher.publishEvent(
-                    new MayorRequestEvent(
-                            email,
-                            mayorToken
-                    )
+            kafka.handleMayorRequestMail(
+                    email,
+                    mayorToken
             );
-
-             */
         }
     }
 
