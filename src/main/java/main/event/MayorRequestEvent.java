@@ -10,6 +10,4 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class MayorRequestEvent extends MailEvent{
-    private String token;
-
 }

@@ -1,101 +1,60 @@
 package main.producer;
 
 import lombok.RequiredArgsConstructor;
+import main.dto.enums.RequestsActionEnum;
 import main.event.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.event.EventListener;
+import main.service.application.RequestResponseResultService;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scheduling.annotation.Async;
 
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
 public class KafkaProducer {
 
-    @Value("${app.url}")
-    private String appUrl;
-    @Value("${mail.main}")
-    private String mainMail;
-
     private final KafkaTemplate<String, MailEvent> kafka;
+    private final RequestResponseResultService resultService;
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleMail(RegistrationEvent userEvent){
-        String link = appUrl + "/mail/confirm?token=" + userEvent.getToken();
-/*
-        mailService.sendMail(
-                userEvent.getEmail(),
-                "Mail confirmation",
-                "Please use this link for confirm your mail: " + link
-        );
+    public void handleRegistration(String email, String token){
+        RegistrationEvent event =  new RegistrationEvent();
+        build(event,email, token);
+        kafka.send("user-registered", event);
 
- */
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleAdminRequestMail(AdminRequestEvent adminEvent){
-        String link = appUrl + "/admin/request?token=" + adminEvent.getToken();
-/*
-        mailService.sendMail(
-                mainMail,
-                "Admin confirmation",
-                "Use this link confirm or reject admin: " + link
-        );
-
- */
+    public void handleAdminRequestMail(String email, String token){
+        AdminRequestEvent event = new AdminRequestEvent();
+        build(event,email, token);
+        kafka.send("admin-request", event);
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleMayorRequestMail(MayorRequestEvent mayorRequestEvent) {
-        String link = appUrl + "/mayor/request?token=" + mayorRequestEvent.getToken();
-/*
-        mailService.sendMail(
-                mayorRequestEvent.getAdminEmail(),
-                "Mayor confirmation",
-                "Use this link to confirm or reject the mayor request: " + link
-        );
-
- */
+    public void handleMayorRequestMail(String email, String token) {
+        MayorRequestEvent event = new MayorRequestEvent();
+        build(event,email, token);
+        kafka.send("mayor-request", event);
     }
 
-    @EventListener
-    public void handleAdminRequestResponseMail(RequestResponseEvent adminResponseEvent){/*
-        mailService.sendMail(
-                adminResponseEvent.getEmail(),
-                "Admin request results",
-                resultService.handleRequestResult(adminResponseEvent.getAction())
-        );
-        */
+    public void handleRequestResponseMail(String email, RequestsActionEnum action){
+        RequestResponseEvent event = new RequestResponseEvent();
+        build(event,email);
+        event.setMessage(resultService.handleRequestResult(action));
+        kafka.send("request-response", event);
     }
 
-    @EventListener
-    public void handleMayorRequestResponseMail(RequestResponseEvent mayorResponseEvent){
-        /*
-        mailService.sendMail(
-                mayorResponseEvent.getEmail(),
-                "Mayor request results",
-                resultService.handleRequestResult(mayorResponseEvent.getAction())
-        );
-
-         */
+    public void handleLoginMail(String email){
+        LoginEvent event = new LoginEvent();
+        build(event,email);
+        event.setTime(LocalDateTime.now());
+        kafka.send("user-logged", event);
     }
 
-    @Async
-    @EventListener
-    public void handleLoginMail(LoginEvent loginEvent){
-        /*
-        mailService.sendMail(
-                loginEvent.getEmail(),
-                "Successful login",
-                "Successful login was made. Time: " + loginEvent.getTime()
-        );
-
-         */
+    private void build(MailEvent event, String email){
+        event.setEmail(email);
+    }
+    private void build(MailEvent event, String email, String token){
+        event.setEmail(email);
+        event.setToken(token);
     }
 }
