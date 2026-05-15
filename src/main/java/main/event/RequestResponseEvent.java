@@ -1,16 +1,16 @@
 package main.event;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import main.dto.enums.RequestsActionEnum;
 
-@Getter
-public class RequestResponseEvent {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class RequestResponseEvent extends MailEvent {
+    private RequestsActionEnum action;
 
-    private final String email;
-    private final RequestsActionEnum action;
-
-    public RequestResponseEvent(String email, RequestsActionEnum action) {
-        this.email = email;
-        this.action = action;
-    }
 }

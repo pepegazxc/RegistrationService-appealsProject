@@ -1,15 +1,15 @@
 package main.event;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-@Getter
-public class MayorRequestEvent {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class MayorRequestEvent extends MailEvent{
+    private String token;
 
-    private final String adminEmail;
-    private final String token;
-
-    public MayorRequestEvent(String adminEmail, String token) {
-        this.adminEmail = adminEmail;
-        this.token = token;
-    }
 }

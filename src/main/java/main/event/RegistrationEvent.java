@@ -1,15 +1,14 @@
 package main.event;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-@Getter
-public class RegistrationEvent {
-
-    private final String email;
-    private final String token;
-
-    public RegistrationEvent(String email, String token) {
-        this.email = email;
-        this.token = token;
-    }
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class RegistrationEvent extends MailEvent {
+    private String token;
 }

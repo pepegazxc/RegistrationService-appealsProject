@@ -53,10 +53,13 @@ public class JsonAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
         String email = decrypt(usersEntity.getCipherEmail());
 
+        /*
         publisher.publishEvent(new LoginEvent(
                 email,
                 LocalDateTime.now()
         ));
+
+         */
 
         response.getWriter().write(objectMapper.writeValueAsString(loginResponse));
     }

@@ -57,12 +57,16 @@ public class AdminRequestService {
 
         setNewStatusToUser(user, newRole);
 
+        /*
         publisher.publishEvent(
+
                 new RequestResponseEvent(
                         decryptEmail(user.getCipherEmail()),
                         actionRequest.getAction()
                 )
         );
+
+         */
     }
 
     @Transactional
@@ -74,11 +78,14 @@ public class AdminRequestService {
 
         String token = admin.getToken();
 
+        /*
         publisher.publishEvent(
                 new AdminRequestEvent(
                         token
                 )
         );
+
+         */
     }
 
     private AdminRequestEntity buildAdminRequest(UsersEntity user, AdminRequestStatusEntity status){

@@ -73,11 +73,14 @@ public class RegistrationService implements UserDetailsService {
 
         String token = emailService.generateTokenForEmail(user);
 
+        /*
         publisher.publishEvent(new RegistrationEvent(
                 decryptEmail(user.getCipherEmail()),
                 token
                 )
         );
+
+         */
     }
 
     private String generateUserIdentifier(){

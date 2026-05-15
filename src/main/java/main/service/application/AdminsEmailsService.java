@@ -26,12 +26,15 @@ public class AdminsEmailsService {
         List<String> emails = getAdminsEmails();
 
         for(String email : emails) {
+            /*
             publisher.publishEvent(
                     new MayorRequestEvent(
                             email,
                             mayorToken
                     )
             );
+
+             */
         }
     }
 

@@ -1,17 +1,17 @@
 package main.event;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Getter
-public class LoginEvent {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class LoginEvent extends MailEvent{
+    private LocalDateTime time;
 
-    private final String email;
-    private final LocalDateTime time;
-
-    public LoginEvent(String email, LocalDateTime time) {
-        this.email = email;
-        this.time = time;
-    }
 }

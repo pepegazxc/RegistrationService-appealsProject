@@ -1,9 +1,10 @@
-package main.listener;
+package main.producer;
 
 import lombok.RequiredArgsConstructor;
 import main.event.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 
 import org.springframework.stereotype.Component;
@@ -12,12 +13,14 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
-public class KafkaListener {
+public class KafkaProducer {
 
     @Value("${app.url}")
     private String appUrl;
     @Value("${mail.main}")
     private String mainMail;
+
+    private final KafkaTemplate<String, MailEvent> kafka;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
