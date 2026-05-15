@@ -48,12 +48,20 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
 
   registration-service:
     image: pepegazxc/registration-service:1.0
     container_name: registration-service
     restart: always
+    networks:
+      - kafka-network
     ports:
       - "8081:8081"
     env_file:
@@ -63,6 +71,12 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      kafka:
+        condition: service_healthy
+
+networks:
+  kafka-network:
+    driver: bridge
 
 volumes:
    pgdata:
