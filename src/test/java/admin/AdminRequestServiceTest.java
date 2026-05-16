@@ -6,13 +6,11 @@ import main.entity.AdminRequestEntity;
 import main.entity.AdminRequestStatusEntity;
 import main.entity.RolesEntity;
 import main.entity.UsersEntity;
-import main.event.AdminRequestEvent;
-import main.event.RegistrationEvent;
-import main.event.RequestResponseEvent;
 import main.exception.request.AdminRequestNotFoundException;
 import main.exception.request.AdminRequestStatusNotFoundException;
 import main.exception.request.RequestExpiredException;
 import main.exception.request.RequestIsUsedException;
+import main.producer.KafkaProducer;
 import main.repository.AdminRequestRepository;
 import main.service.application.AdminRequestService;
 import main.service.application.AdminRequestStatusService;
@@ -26,7 +24,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -34,15 +31,14 @@ import java.util.Optional;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-
 @ExtendWith(MockitoExtension.class)
 public class AdminRequestServiceTest {
 
-    @Mock private  AdminRequestRepository adminRequestRepository;
-    @Mock private  ApplicationEventPublisher publisher;
-    @Mock private  AdminRequestStatusService adminRequestStatusService;
+    @Mock private AdminRequestRepository adminRequestRepository;
+    @Mock private AdminRequestStatusService adminRequestStatusService;
     @Mock private RoleService roleService;
     @Mock private CipherService cipher;
+    @Mock private KafkaProducer kafka;
 
     @InjectMocks
     private AdminRequestService adminRequestService;
@@ -54,7 +50,7 @@ public class AdminRequestServiceTest {
     private RolesEntity fakeRole;
 
     @BeforeEach
-    void globalSetUp(){
+    void globalSetUp() {
         fakeUser = new UsersEntity();
         fakeStatus = new AdminRequestStatusEntity();
         fakeRequest = new AdminRequestEntity();
@@ -66,7 +62,7 @@ public class AdminRequestServiceTest {
     class SuccessAdd {
 
         @BeforeEach
-        void successSetUp(){
+        void successSetUp() {
             fakeUser.setId(1L);
             fakeStatus.setStatus("PENDING");
             when(adminRequestStatusService.findAdminRequestStatus(anyString()))
@@ -75,25 +71,19 @@ public class AdminRequestServiceTest {
 
         @Test
         public void addAdminRequest_success_shouldAddAdminRequest() {
-            fakeUser.setId(1L);
-            fakeStatus.setStatus("PENDING");
-
             adminRequestService.addAdminRequest(fakeUser);
 
-            ArgumentCaptor<AdminRequestEntity> captorRequest = ArgumentCaptor.forClass(AdminRequestEntity.class);
-            ArgumentCaptor<AdminRequestEvent> captorEvent = ArgumentCaptor.forClass(AdminRequestEvent.class);
+            ArgumentCaptor<AdminRequestEntity> captorRequest =
+                    ArgumentCaptor.forClass(AdminRequestEntity.class);
 
             verify(adminRequestRepository).save(captorRequest.capture());
-            verify(publisher).publishEvent(captorEvent.capture());
 
-            AdminRequestEntity fakeAdmin = captorRequest.getValue();
-            assertEquals(fakeUser, fakeAdmin.getUser(), "User must be linked to request");
-            assertEquals(fakeStatus, fakeAdmin.getStatus(), "Status must be 'PENDING'");
-            assertNotNull(fakeAdmin.getToken(), "Token must be generated");
+            AdminRequestEntity saved = captorRequest.getValue();
+            assertEquals(fakeUser, saved.getUser(), "User must be linked to request");
+            assertEquals(fakeStatus, saved.getStatus(), "Status must be 'PENDING'");
+            assertNotNull(saved.getToken(), "Token must be generated");
 
-            AdminRequestEvent fakeEvent = captorEvent.getValue();
-            assertNotNull(fakeEvent.getToken(), "Token must be transmitted");
-            assertEquals(fakeAdmin.getToken(), fakeEvent.getToken(), "Tokens must be equals");
+            verify(kafka).handleAdminRequestMail(saved.getToken());
         }
 
         @Test
@@ -119,25 +109,14 @@ public class AdminRequestServiceTest {
 
             adminRequestService.handleAdminRequest("token", action);
 
-            verify(adminRequestRepository).findByToken("token");
-            verify(adminRequestStatusService).findAdminRequestStatus("APPROVED");
-            verify(roleService).findRole("admin");
-
             assertEquals(fakeStatus, fakeRequest.getStatus());
             assertTrue(fakeRequest.getIsUsed());
             assertNotNull(fakeRequest.getReviewedAt());
             assertEquals(fakeRole, fakeUser.getRole());
 
-            ArgumentCaptor<RequestResponseEvent> eventCaptor =
-                    ArgumentCaptor.forClass(RequestResponseEvent.class);
-
-            verify(publisher).publishEvent(eventCaptor.capture());
-
-            RequestResponseEvent event = eventCaptor.getValue();
-
-            assertEquals("test@mail.com", event.getEmail());
-            assertEquals(RequestsActionEnum.APPROVED, event.getAction());
+            verify(kafka).handleRequestResponseMail("test@mail.com", RequestsActionEnum.APPROVED);
         }
+
         @Test
         public void handleAdminRequest_success_shouldHandleRejectedAdminRequest() {
             action.setAction(RequestsActionEnum.REJECTED);
@@ -161,37 +140,20 @@ public class AdminRequestServiceTest {
 
             adminRequestService.handleAdminRequest("token", action);
 
-            verify(adminRequestRepository).findByToken("token");
-            verify(adminRequestStatusService).findAdminRequestStatus("REJECTED");
-            verify(roleService).findRole("user");
-
             assertEquals(fakeStatus, fakeRequest.getStatus());
             assertTrue(fakeRequest.getIsUsed());
             assertNotNull(fakeRequest.getReviewedAt());
             assertEquals(fakeRole, fakeUser.getRole());
 
-            ArgumentCaptor<RequestResponseEvent> eventCaptor =
-                    ArgumentCaptor.forClass(RequestResponseEvent.class);
-
-            verify(publisher).publishEvent(eventCaptor.capture());
-
-            RequestResponseEvent event = eventCaptor.getValue();
-
-            assertEquals("test@mail.com", event.getEmail());
-            assertEquals(RequestsActionEnum.REJECTED, event.getAction());
+            verify(kafka).handleRequestResponseMail("test@mail.com", RequestsActionEnum.REJECTED);
         }
     }
 
     @Nested
     class FailedAdd {
         @Test
-        public void addAdminRequest_failed_shouldReturnStatusNotFoundException(){
+        public void addAdminRequest_failed_shouldReturnStatusNotFoundException() {
             fakeUser.setId(1L);
-            fakeStatus.setStatus("fake-status");
-            fakeRequest.setId(1L);
-            fakeRequest.setIsUsed(false);
-            fakeRequest.setExpiresAt(LocalDateTime.now().plusDays(999));
-            fakeRequest.setUser(fakeUser);
 
             when(adminRequestStatusService.findAdminRequestStatus(any()))
                     .thenThrow(new AdminRequestStatusNotFoundException());
@@ -200,12 +162,10 @@ public class AdminRequestServiceTest {
                     () -> adminRequestService.addAdminRequest(fakeUser));
         }
     }
+
     @Test
-    public void handleAdminRequest_failed_shouldReturnRequestIsUsedException(){
+    public void handleAdminRequest_failed_shouldReturnRequestIsUsedException() {
         action.setAction(RequestsActionEnum.APPROVED);
-        fakeUser.setId(1L);
-        fakeStatus.setStatus("fake-status");
-        fakeRequest.setId(1L);
         fakeRequest.setIsUsed(true);
         fakeRequest.setExpiresAt(LocalDateTime.now().plusDays(999));
         fakeRequest.setUser(fakeUser);
@@ -214,18 +174,12 @@ public class AdminRequestServiceTest {
                 .thenReturn(Optional.of(fakeRequest));
 
         assertThrows(RequestIsUsedException.class,
-                () -> adminRequestService.handleAdminRequest("token",action ));
+                () -> adminRequestService.handleAdminRequest("token", action));
     }
 
     @Test
-    public void handleAdminRequest_failed_shouldReturnRequestNotFoundException(){
+    public void handleAdminRequest_failed_shouldReturnRequestNotFoundException() {
         action.setAction(RequestsActionEnum.APPROVED);
-        fakeUser.setId(1L);
-        fakeStatus.setStatus("fake-status");
-        fakeRequest.setId(1L);
-        fakeRequest.setIsUsed(true);
-        fakeRequest.setExpiresAt(LocalDateTime.now().plusDays(999));
-        fakeRequest.setUser(fakeUser);
 
         when(adminRequestRepository.findByToken("token"))
                 .thenThrow(new AdminRequestNotFoundException());
@@ -233,12 +187,10 @@ public class AdminRequestServiceTest {
         assertThrows(AdminRequestNotFoundException.class,
                 () -> adminRequestService.handleAdminRequest("token", action));
     }
+
     @Test
-    public void handleAdminRequest_failed_shouldReturnTokenIsExpired(){
+    public void handleAdminRequest_failed_shouldReturnTokenIsExpired() {
         action.setAction(RequestsActionEnum.APPROVED);
-        fakeUser.setId(1L);
-        fakeStatus.setStatus("fake-status");
-        fakeRequest.setId(1L);
         fakeRequest.setIsUsed(false);
         fakeRequest.setExpiresAt(LocalDateTime.now().minusDays(1));
         fakeRequest.setUser(fakeUser);

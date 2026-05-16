@@ -33,7 +33,7 @@ public class AdminRequestService {
     private final RoleService roleService;
     private final AdminRequestStatusService adminRequestStatusService;
     private final CipherService cipher;
-    private KafkaProducer kafka;
+    private final KafkaProducer kafka;
 
     @Transactional
     public void handleAdminRequest(String token, RequestsActionRequest actionRequest){
