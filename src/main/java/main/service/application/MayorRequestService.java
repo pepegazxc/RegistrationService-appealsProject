@@ -64,9 +64,9 @@ public class MayorRequestService {
 
         setNewRole(user, role);
 
-        kafka.handleMayorRequestMail(
+        kafka.handleRequestResponseMail(
                 decryptEmail(user.getCipherEmail()),
-                token
+                actionRequest.getAction()
         );
     }
 
