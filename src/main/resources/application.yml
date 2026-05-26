@@ -45,3 +45,6 @@ app:
 
 mail:
   main: ${MAIN_MAIL}
+
+internal:
+  secret: ${INTERNAL_SECRET}

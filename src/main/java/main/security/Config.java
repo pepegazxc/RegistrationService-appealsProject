@@ -23,7 +23,8 @@ public class Config {
             HttpSecurity http,
             AuthenticationManager authManager,
             JsonAuthenticationSuccessHandler successHandler,
-            JsonAuthenticationFailedHandler failedHandler
+            JsonAuthenticationFailedHandler failedHandler,
+            InternalTokenFilter internalTokenFilter
     ) throws Exception {
         JsonAuthenticationFilter jsonAuthenticationFilter = new JsonAuthenticationFilter(authManager, successHandler,failedHandler);
 
@@ -31,11 +32,16 @@ public class Config {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/registration","/login","/mail/confirm").permitAll()
+                        .requestMatchers("/internal/**").hasRole("INTERNAL")
                         .requestMatchers("/token/refresh").hasAnyRole("USER", "ADMIN", "MAYOR")
                         .anyRequest().authenticated()
                 )
                 .addFilterAt(
                         jsonAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
+                .addFilterBefore(
+                        internalTokenFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .build();
