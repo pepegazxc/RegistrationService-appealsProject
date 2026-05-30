@@ -20,4 +20,8 @@ public interface UserRepository extends JpaRepository<UsersEntity, Long> {
     List<String> selectAdminsEmails();
 
     Optional<UsersEntity> findByUserIdentifier(String userIdentifier);
+
+    @Query(nativeQuery = true,
+    value = "SELECT users.cipher_email FROM users WHERE role_id = 6")
+    List<String> selectMayorsEmails();
 }

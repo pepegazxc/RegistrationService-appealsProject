@@ -1,11 +1,14 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
+import main.dto.response.InternalMayorEmailDto;
 import main.dto.response.InternalUserDto;
 import main.service.application.InternalService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,5 +20,11 @@ public class InternalController {
     public InternalUserDto getUserEmail(@PathVariable String userIdentifier){
         String email = internalService.getEmail(userIdentifier);
         return new InternalUserDto(email);
+    }
+
+    @GetMapping("/internal/getMayorsEmails")
+    public InternalMayorEmailDto getMayorsEmails(){
+        List<String> emails = internalService.getMayorsEmails();
+        return new InternalMayorEmailDto(emails);
     }
 }

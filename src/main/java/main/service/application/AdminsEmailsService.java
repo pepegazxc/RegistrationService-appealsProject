@@ -1,7 +1,7 @@
 package main.service.application;
 
 import lombok.RequiredArgsConstructor;
-import main.exception.email.AdminsEmailsNotFoundException;
+import main.exception.email.EmailsNotFoundException;
 import main.producer.KafkaProducer;
 import main.repository.UserRepository;
 import main.service.infrastructure.CipherService;
@@ -31,7 +31,7 @@ public class AdminsEmailsService {
     private List<String> getAdminsEmails(){
         List<String> emails = userRepository.selectAdminsEmails();
 
-        if (emails == null || emails.isEmpty()) throw new AdminsEmailsNotFoundException();
+        if (emails == null || emails.isEmpty()) throw new EmailsNotFoundException();
 
         return emails.stream().map(cipher::decrypt).toList();
     }
