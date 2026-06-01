@@ -61,12 +61,13 @@ services:
     image: pepegazxc/registration-service:1.0
     container_name: registration-service
     restart: always
-    networks:
-      - kafka-network
     ports:
       - "8081:8081"
     env_file:
       - .env
+    networks:
+      - kafka-network
+      - app-network
     depends_on:
       postgres:
         condition: service_healthy
@@ -77,6 +78,8 @@ services:
 
 networks:
   kafka-network:
+    driver: bridge
+  app-network:
     driver: bridge
 
 volumes:
