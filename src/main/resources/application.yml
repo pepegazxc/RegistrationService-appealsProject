@@ -40,11 +40,5 @@ Jasypt:
 token:
   key: ${JWT_KEY}
 
-app:
-  url: ${APP_URL}
-
-mail:
-  main: ${MAIN_MAIL}
-
 internal:
   secret: ${INTERNAL_SECRET}
