@@ -10,6 +10,8 @@ services:
         - "5432:5432"
       volumes:
         - pgdata:/var/lib/postgresql
+      networks:
+        - app-network
       healthcheck:
         test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME}"]
         interval: 5s
@@ -20,6 +22,8 @@ services:
       image: redis
       restart: always
       command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+      networks:
+        - app-network
       ports:
         - "6379:6379"
       volumes:
@@ -50,7 +54,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     healthcheck:
-      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      test:  ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "kafka:9092"]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -68,6 +72,10 @@ services:
     networks:
       - kafka-network
       - app-network
+    environment:
+      - POSTGRES_DOCKER_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      - REDIS_DOCKER_URL=redis://redis:6379/0
+      - KAFKA_DOCKER_URL=kafka:9092
     depends_on:
       postgres:
         condition: service_healthy

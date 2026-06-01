@@ -9,7 +9,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     password: ${POSTGRES_PASSWORD}
     username: ${POSTGRES_USERNAME}
-    url: ${POSTGRES_URL}
+    url: ${POSTGRES_DOCKER_URL:${POSTGRES_URL}}
 
   jpa:
     database: postgresql
@@ -20,11 +20,11 @@ spring:
   data:
     redis:
       port: ${REDIS_PORT}
-      host: ${REDIS_HOST}
+      host: ${REDIS_HOST:redis}
       password: ${REDIS_PASSWORD}
 
   kafka:
-    bootstrap-servers: localhost:9094
+    bootstrap-servers: ${KAFKA_DOCKER_URL:localhost:9094}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
